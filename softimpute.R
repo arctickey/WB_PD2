@@ -11,6 +11,8 @@ impute_softimpute <- function(df, mode_vars = FALSE, leave_missing = NULL){
   #mode_vars{colnames-string}: variables where impute mode, default: all factors
   #leave_missing{colnames-string}: variables where NA becomes new category (convert to factor)
   
+  df <- dataset
+  
   factors <- sapply(df, is.factor)
   
   if(any(factors)){
@@ -46,9 +48,14 @@ impute_softimpute <- function(df, mode_vars = FALSE, leave_missing = NULL){
     }
     
     #softimpute for numerical
+    #If only one numerical variable left it's not working => median imputation
     df_numerical <- as.matrix(df[, !factors])
-    fits <- softImpute(df_numerical)
-    ready_numerical <- softImpute::complete(df_numerical, fits)
+    if(length(df_numerical)[1] <= 1){
+      ready_numerical <- prepareMedian(df_numerical)
+    }else{
+      fits <- softImpute(cbind(df_numerical, df_numerical))
+      ready_numerical <- softImpute::complete(df_numerical, fits)
+    }
     
     ready_df <- cbind(df_factors, as.data.frame(ready_numerical))
     return(ready_df)
@@ -65,13 +72,10 @@ impute_softimpute <- function(df, mode_vars = FALSE, leave_missing = NULL){
 }
 
 
-# #Test1
-# library(OpenML)
-# task <- getOMLDataSet(data.id = 38)
-# df <- task$data
-# df <- subset(df, select = -c(TBG, TBG_measured))
-# #All categorical vars imputed with mode
-# imputed_df <- impute_softimpute(df)
+#Test1
+# source("/home/piotr/Programowanie/WB/fork_grupy/2020L-WarsztatyBadawcze-Imputacja/datasets/openml_dataset_23381/code.R", chdir = TRUE)
+# source("Amelia_Mice_Median.R")
+# imputed_df <- impute_softimpute(dataset)
 # 
 # #Test2
 # task <- getOMLDataSet(data.id = 29)

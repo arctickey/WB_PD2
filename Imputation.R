@@ -23,8 +23,8 @@ all_imputation <- function(data,target){
   
   
   
-  train_set = sample(nrow(dataset_raw), 0.8 * nrow(dataset_raw))
-  test_set = setdiff(seq_len(nrow(dataset_raw)), train_set)
+  train_set = sample(nrow(data), 0.8 * nrow(data))
+  test_set = setdiff(seq_len(nrow(data)), train_set)
   
   # Factory w OpenML kategoryczne i miejmy nadzieję ,że gdzie indziej też 
   factors <- sapply(data, is.factor)
@@ -95,6 +95,6 @@ all_imputation <- function(data,target){
 
 
 
-w<- all_imputation(dataset_raw[,-56],target_column)
+#w<- all_imputation(dataset_raw[,-56],target_column)
 
-ifelse(class(dataset_raw) %in% c("character", "factor"),TRUE,FALSE)
+#ifelse(class(dataset_raw) %in% c("character", "factor"),TRUE,FALSE)
