@@ -1,10 +1,8 @@
 #Softimpute: działa tylko dla numerycznych, dlatego:
 #- softimpute dla zmiennych numerycznych
 #- zmienne kategoryczne: uzupełnienie modą lub pozostawienie braku jako nowa kategoria
-#Rozwiązuje to problem jeśli zmienne kategoryczne mamy jako factory,
-#jak użyjemy jakiegoś kodowania, np. do 0-1 to taka zmienna będzie już numeryczna
-#i softimpute wstawi dla braków wartości z przedziału [0,1], więc na razie założyłem
-#że ewentualna inżynieria zmiennych będzie po imputacji
+# Jak zostaje nam 1 lub 0 kolumn numerycznych, softimpute nie działa i zwracam NA
+
 library(softImpute)
 
 impute_softimpute <- function(df, mode_vars = FALSE, leave_missing = NULL){
@@ -16,6 +14,18 @@ impute_softimpute <- function(df, mode_vars = FALSE, leave_missing = NULL){
   factors <- sapply(df, is.factor)
   
   if(any(factors)){
+    
+    #softimpute for numerical
+    #If only one numerical variable left it's not working => no sense
+    df_numerical <- as.matrix(df[, !factors])
+    if(length(df_numerical[1]) <= 1){
+      #Returning NA when no numerical variables to inpute
+      return(NA)
+    }else{
+      fits <- softImpute(df_numerical)
+      ready_numerical <- softImpute::complete(df_numerical, fits)
+    }
+    
     
     df_factors <- df[, factors]
     
@@ -45,16 +55,6 @@ impute_softimpute <- function(df, mode_vars = FALSE, leave_missing = NULL){
     #for categorical where impute category => NA as factor
     for (var in leave_missing){
       df_factors[, var] <-  addNA(df_factors[, var])
-    }
-    
-    #softimpute for numerical
-    #If only one numerical variable left it's not working => median imputation
-    df_numerical <- as.matrix(df[, !factors])
-    if(length(df_numerical)[1] <= 1){
-      ready_numerical <- prepareMedian(df_numerical)
-    }else{
-      fits <- softImpute(cbind(df_numerical, df_numerical))
-      ready_numerical <- softImpute::complete(df_numerical, fits)
     }
     
     ready_df <- cbind(df_factors, as.data.frame(ready_numerical))
