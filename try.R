@@ -8,8 +8,9 @@ time_it <- function(impute_exp, time_limit){
                          timeout = time_limit)
     },
     TimeoutException = function(ex){
-      return(NA)
-      cat("Timeout. Skip.\n")
+      print("Timeout. Skip.\n")
+      return(TRUE)
+      
     }
   )
 }
@@ -23,4 +24,4 @@ x <- time_it(dziala(), 2)
 y <- time_it(dziala(), 5)
 
 #nie działa
-#z <- time_it(impute_missMDA(dataset), 0.5)
+z <- time_it(impute_softimpute(dataset), 1)

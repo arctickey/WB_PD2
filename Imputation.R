@@ -1,5 +1,5 @@
 
-loading <- function(){
+loading1 <- function(){
   # Funkcja wczytuje niezbędne funkcije z plików 
 source('./Amelia_Mice_Median.R')
 source('./missForest.R')
@@ -7,7 +7,7 @@ source('./missmda.R')
 source('./VIM.R')
 source('./softimpute.R')
 }
-
+loading1()
 
 all_imputation <- function(data,target){
   # Dane podajemy bez zmiennej celu 
@@ -19,7 +19,7 @@ all_imputation <- function(data,target){
   # 2 lista Zbiór lub obiekt który zwraca imputacja( np. Amelia  zwraca w tym wypadku osobno obiekt dla testowego i treningowego zbioru ) 
   # 3 Indeksy zbioru treningowego 
   # 4 Indeksy zbioru testoweg
-  # oczywiście ponieważ R nie lubi krotek to wszystko jeszcze wpycham w wektor 
+  # oczywiście ponieważ R nie lubi krotek to wszystko jeszcze wpycham w liste 
   
   
   
@@ -42,10 +42,16 @@ all_imputation <- function(data,target){
   print('softImpute successful')
   
   ## missForest z tego co patrzyłem ogarniał wszyskie rodzaje zmiennych ale długo działa 
+  q <- TRUE 
+  time_it({
   data_missForest <- data
   data_missForest[train_set,] <- misinf_forest_aut(data_missForest[train_set,])
   data_missForest[test_set,] <- misinf_forest_aut(data_missForest[test_set,])
   print('missForest successful')
+  q <- FALSE},600)
+  
+  if (q){data_missForest <- NULL}
+  
   # Amelia problem ze zwracanym obiektem nie wiem za bardzo jak to podzielić i skleić w jedno 
   data_Amelia <- data
   data_Amelia_train <- prepareAmelia(data_Amelia[train_set,],noms = factors)
@@ -59,17 +65,24 @@ all_imputation <- function(data,target){
   print('modeMedian successful')
   
   #Mice
+  c <- TRUE 
+  time_it({
   data_mice <- data
   data_mice[train_set,] <- prepareMice(data_mice[train_set,])
   data_mice[test_set,] <- prepareMice(data_mice[test_set,])
   print('Mice successful')
-  
+  c <- FALSE},600)
+  if (c){data_mice <- NULL}
   # VIM_irmi też raczej ogrnia wszystko 
+  a <- TRUE
+  time_it({
   data_irmi <- data
   data_irmi[train_set,] <- VIM_irmi(data_irmi[train_set,])
   data_irmi[test_set,] <- VIM_irmi(data_irmi[test_set,])
   print('VIM_irmi successful')
-  
+  a <- FALSE
+  },600)
+  if (a){data_irmi <- NULL}
   # VIM_knn to może być problematyczne dla sytuacij gdy nie ma prawie wcale danych numerycznych ale zobaczymy 
   data_knn <- data
   data_knn[train_set,] <- VIM_knn(data_knn[train_set,])
@@ -77,23 +90,31 @@ all_imputation <- function(data,target){
   print('VIMM_knn successful')
   
   # missMDA 
-  
+  w <- TRUE
+  w <- time_it({
   data_missMDA <- data
   data_missMDA[train_set,] <- impute_missMDA(data_missMDA[train_set,])
   data_missMDA[test_set,] <- impute_missMDA(data_missMDA[test_set,])
+  w <- FALSE},600)
   #print('missMDA successful'): jest w funkcji imputującej
-  
+  if (w){data_missMDA <- NULL}
   
   type_of_imputation <- list('missMDA','softImpute','MissForest','Amelia','Mediana/Moda','Mice','VIM_irmi','VIM_knn')
   datasets <- list(data_missMDA,data_softImpute,data_missForest,c(data_Amelia_train,data_Amelia_test),data_median,data_mice,data_irmi,data_knn)
   
-  return(c(type_of_imputation,datasets,train_set,test_set))
+  return(list(type_of_imputation,datasets,train_set,test_set))
 
   
 }
 
 
 
-#w<- all_imputation(dataset_raw[,-56],target_column)
+w<- all_imputation(dataset[1:2000,-13],target_column)
 
 #ifelse(class(dataset_raw) %in% c("character", "factor"),TRUE,FALSE)
+
+
+w[2]
+
+vis_dat(dataset[1:2000,])
+
