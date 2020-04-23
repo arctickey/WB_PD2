@@ -7,12 +7,17 @@ script_paths <- paste(folder, '/', 'code.R', sep='')
 
 for(i in script_paths){
   source(i, chdir = TRUE)
+  source("Imputation.R")
+  loading()
   
+  #NIE IDZIE missmda na id: 40536, 41278 - imo za duże + zm kategoryczne
   
-  #Test
-  print(target_column)
-  print(nrow(dataset))
+  #Poprawki na zbiorach
+  if(openml_id == 6332){
+    dataset <- subset(dataset, select = -timestamp)
+  }
   
+  imput_result <- all_imputation(dataset, target_column)
   
   #Cleaning environment - wszystko musi się policzyć wyżej
   rm(list = ls())

@@ -81,8 +81,7 @@ all_imputation <- function(data,target){
   data_missMDA <- data
   data_missMDA[train_set,] <- impute_missMDA(data_missMDA[train_set,])
   data_missMDA[test_set,] <- impute_missMDA(data_missMDA[test_set,])
-  
-  print('missMDA successful')
+  #print('missMDA successful'): jest w funkcji imputującej
   
   
   type_of_imputation <- list('missMDA','softImpute','MissForest','Amelia','Mediana/Moda','Mice','VIM_irmi','VIM_knn')
