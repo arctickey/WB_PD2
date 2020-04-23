@@ -38,7 +38,7 @@ prepareMedian <- function(data){
   #uzupełnianie medianą i modą w zależności od typu kolumny
   for (var in 1:ncol(data)) {
     if (class(data[,var])=="numeric") {
-      data[is.na(data[,var]),var] <- mean(data[,var], na.rm = TRUE)
+      data[is.na(data[,var]),var] <- median(data[,var], na.rm = TRUE)
     } else if (class(data[,var]) %in% c("character", "factor")) {
       data[is.na(data[,var]),var] <- Mode(data[,var], na.rm = TRUE)
     }
