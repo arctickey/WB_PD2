@@ -73,9 +73,9 @@ impute_softimpute <- function(df, mode_vars = FALSE, leave_missing = NULL){
 
 
 #Test1
-source("/home/piotr/Programowanie/WB/fork_grupy/2020L-WarsztatyBadawcze-Imputacja/datasets/openml_dataset_1590/code.R", chdir = TRUE)
-source("Amelia_Mice_Median.R")
-imputed_df <- impute_softimpute(dataset)
+# source("/home/piotr/Programowanie/WB/fork_grupy/2020L-WarsztatyBadawcze-Imputacja/datasets/openml_dataset_1590/code.R", chdir = TRUE)
+# source("Amelia_Mice_Median.R")
+# imputed_df <- impute_softimpute(dataset)
 # 
 # #Test2
 # task <- getOMLDataSet(data.id = 29)
