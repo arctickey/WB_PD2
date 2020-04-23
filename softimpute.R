@@ -9,16 +9,16 @@ impute_softimpute <- function(df, mode_vars = FALSE, leave_missing = NULL){
   #mode_vars{colnames-string}: variables where impute mode, default: all factors
   #leave_missing{colnames-string}: variables where NA becomes new category (convert to factor)
   
-  df <- dataset
-  
   factors <- sapply(df, is.factor)
   
   if(any(factors)){
     
     #softimpute for numerical
     #If only one numerical variable left it's not working => no sense
+    num <- length(df[1, !factors])
+    
     df_numerical <- as.matrix(df[, !factors])
-    if(length(df_numerical[1]) <= 1){
+    if(num <= 1){
       #Returning NA when no numerical variables to inpute
       return(NA)
     }else{
@@ -73,9 +73,9 @@ impute_softimpute <- function(df, mode_vars = FALSE, leave_missing = NULL){
 
 
 #Test1
-# source("/home/piotr/Programowanie/WB/fork_grupy/2020L-WarsztatyBadawcze-Imputacja/datasets/openml_dataset_23381/code.R", chdir = TRUE)
-# source("Amelia_Mice_Median.R")
-# imputed_df <- impute_softimpute(dataset)
+source("/home/piotr/Programowanie/WB/fork_grupy/2020L-WarsztatyBadawcze-Imputacja/datasets/openml_dataset_1590/code.R", chdir = TRUE)
+source("Amelia_Mice_Median.R")
+imputed_df <- impute_softimpute(dataset)
 # 
 # #Test2
 # task <- getOMLDataSet(data.id = 29)
