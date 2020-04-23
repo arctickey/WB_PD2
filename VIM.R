@@ -36,4 +36,3 @@ VIM_irmi <-  function (data,path_to_jason){
   return(data)
 }
 
-dupa <- VIM_irmi(dataset_raw,'dresses_sales.json')
