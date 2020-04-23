@@ -5,20 +5,14 @@ library(mlr)
 
 
 
-misinf_forest_aut <- function (datapath_to_jason){
+misinf_forest_aut <- function (data){
   ### data - surowe dane zawierające kolumne celu 
   ### scieżka do pliku jason opisującego dane 
   ### model do trenowania string z nazwą modelu
   ### train_set index
   ### test_set index 
   ### ZWRACA PRAWDOPODOBIEństwo klas
-  library(rjson)
   
-  c <- fromJSON(file = path_to_jason)
-  
-  
-  w <- 1:length(colnames(data))
-  w <- w[ifelse(colnames(data)==c[5],TRUE,FALSE)]
   #Imputacja danych dla zbioru treningowego i testoweg 
   
   
@@ -33,7 +27,7 @@ misinf_forest_aut <- function (datapath_to_jason){
 #  learner$predict_type = "prob"
   
  # prediction = learner$predict(task_credit, row_ids = test_set)
-  data[,-w] <-  missForest(data[,-w])
+  data <-  missForest(data)$ximp
   return(data)
 }
 
