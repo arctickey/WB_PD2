@@ -27,7 +27,9 @@ misinf_forest_aut <- function (data){
 #  learner$predict_type = "prob"
   
  # prediction = learner$predict(task_credit, row_ids = test_set)
+  try(
   data <-  missForest(data)$ximp
+  )
   return(data)
 }
 

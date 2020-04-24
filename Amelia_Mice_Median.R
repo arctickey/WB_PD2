@@ -13,7 +13,9 @@ prepareAmelia <- function(data,noms=NULL,ords=NULL,idvars=NULL){
   
   #Funkcja wypluwa 5 datasetow ktore pozniej trzeba jakos ze soba polaczyc, najprosciej chyba uzyc tego Zelig
   library(Amelia)
-  imputed<- amelia(data,m=5,noms = noms,ords=ords,idvars=idvars)
+  try(
+  imputed<- amelia(data,m=1,noms = noms,ords=ords,idvars=idvars)
+  )
   return(imputed)
 }
 
@@ -21,7 +23,7 @@ prepareAmelia <- function(data,noms=NULL,ords=NULL,idvars=NULL){
 prepareMice <- function(data){
   #W sumie nic skomlikowanego tutaj nie ma
   library(mice)
-  imp <- mice(data,m=5,maxit=50,meth='pmm',seed=500)
+  imp <- mice(data,m=1,maxit=1,meth='sample',seed=500)
   tempData <- complete(imp)
   return(tempData)
 }

@@ -2,7 +2,7 @@ time_it <- function(impute_exp, time_limit){
   #Czas w sekundach
   tryCatch(
     expr = {
-      res <- withTimeout(impute_exp,
+      res <- R.utils::withTimeout(impute_exp,
                          timeout = time_limit)
     },
     TimeoutException = function(ex){

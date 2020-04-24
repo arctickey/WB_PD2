@@ -1,10 +1,11 @@
 #Biblioteki
 library(mlr3)
 library(tidyverse)
-
+library(R.utils) 
+#setwd('./WB_PD2')
 #Wymaga podmiany reszta powinna działać
 #path_to_datasets <- "/home/piotr/Programowanie/WB/fork_grupy/2020L-WarsztatyBadawcze-Imputacja/datasets"
-#path_to_datasets <- "/home/arctickey/2020L-WarsztatyBadawcze-Imputacja/datasets"
+path_to_datasets <- "/home/arctickey/2020L-WarsztatyBadawcze-Imputacja/datasets"
 
 scores = tibble(Dataset = numeric(),Method = character(),Score = numeric())
 folder <- list.dirs(path_to_datasets)
@@ -27,7 +28,7 @@ for(i in script_paths){
     dataset <- subset(dataset, select = -timestamp)
   }
   
-  imput_result <- all_imputation(dataset, target_column)
+  imput_result <- all_imputation(dataset[1:200,], target_column)
   measure = msr("classif.acc")
   k = length(imput_result[[1]])
   j = 1
@@ -43,6 +44,7 @@ for(i in script_paths){
     j= j+1
   })
 }
+
 colnames(scores) <- c('Dataset','Method','Score')
 scores
 #write.csv(scores, './wyniki.csv')
