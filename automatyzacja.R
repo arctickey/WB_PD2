@@ -16,7 +16,7 @@ source("./Imputation.R")
 loading()
 
 
-for(i in script_paths[8:9]){
+for(i in script_paths){
   source(i, chdir = TRUE)
   
   #Nie działa na zbiorach  29 - błędy w kodowaniu,
@@ -31,6 +31,7 @@ for(i in script_paths[8:9]){
   measure = msr("classif.acc")
   k = length(imput_result[[1]])
   j = 1
+  try(
   while (j<=k){
     task= TaskClassif$new(id =imput_result[[1]][[j]] , backend =imput_result[[2]][[j]], target = target_column)
     learner = lrn("classif.rpart",predict_type='prob')
@@ -40,7 +41,7 @@ for(i in script_paths[8:9]){
     print(imput_result[[1]][[j]])
     scores <- rbind(scores,c(openml_id,imput_result[[1]][[j]],acc))
     j= j+1
-  }
+  })
 }
 colnames(scores) <- c('Dataset','Method','Score')
 scores

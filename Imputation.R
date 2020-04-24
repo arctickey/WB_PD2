@@ -32,16 +32,16 @@ all_imputation <- function(data,target){
  
   ## soft wszystkie kolumny gdzie nie można uzyć pakietu chcę wypełniać modą 
   # zamknąłem w time_it dla bezpieczeństwa
-  data_softImpute <- data
-  time_it({
-  im_train <- impute_softimpute(data_softImpute[train_set,])
-  im_test <- impute_softimpute(data_softImpute[test_set,])
-  r <- rbind(im_train, im_test)
-  ord <- as.numeric(row.names(r))
-  data_softImpute <- r[order(ord), ]},
-  time_limit = 300
-  )
-  print('softImpute successful')
+  #data_softImpute <- data
+  #time_it({
+  #im_train <- impute_softimpute(data_softImpute[train_set,])
+  #im_test <- impute_softimpute(data_softImpute[test_set,])
+  #r <- rbind(im_train, im_test)
+  #ord <- as.numeric(row.names(r))
+  #data_softImpute <- r[order(ord), ]},
+  #time_limit = 300
+  #)
+  #print('softImpute successful')
 
   # missForest z tego co patrzyłem ogarniał wszyskie rodzaje zmiennych ale długo działa 
   # data_missForest <- data
@@ -57,10 +57,10 @@ all_imputation <- function(data,target){
   print('modeMedian successful')
   
   #Mice
-  # data_mice <- data
-  # data_mice[train_set,] <- prepareMice(data_mice[train_set,])
-  # data_mice[test_set,] <- prepareMice(data_mice[test_set,])
-  # print('Mice successful')
+  data_mice <- data
+  data_mice[train_set,] <- prepareMice(data_mice[train_set,])
+  data_mice[test_set,] <- prepareMice(data_mice[test_set,])
+  print('Mice successful')
   # 
   # VIM_irmi też raczej ogrnia wszystko 
   #a <- TRUE
@@ -72,26 +72,28 @@ all_imputation <- function(data,target){
   #a <- FALSE
   #},600)
   #if (a){data_irmi <- NULL}
-  # VIM_knn to może być problematyczne dla sytuacij gdy nie ma prawie wcale danych numerycznych ale zobaczymy 
+  
+  #VIM_knn to może być problematyczne dla sytuacij gdy nie ma prawie wcale danych numerycznych ale zobaczymy 
   #data_knn <- data
   #data_knn[train_set,] <- VIM_knn(data_knn[train_set,])
   #data_knn[test_set,] <- VIM_knn(data_knn[test_set,])
   #print('VIMM_knn successful')
   
   # missMDA 
-  data_missMDA <- data
-  data_missMDA[train_set,] <- impute_missMDA(data_missMDA[train_set,])
-  data_missMDA[test_set,] <- impute_missMDA(data_missMDA[test_set,])
+  #data_missMDA <- data
+  #data_missMDA[train_set,] <- impute_missMDA(data_missMDA[train_set,])
+  #data_missMDA[test_set,] <- impute_missMDA(data_missMDA[test_set,])
+  #print('missmda success')
    
   
   #type_of_imputation <- list('missMDA','softImpute','MissForest','Amelia','Mediana/Moda','Mice','VIM_irmi','VIM_knn')
   #datasets <- list(data_missMDA,data_softImpute,data_missForest,c(data_Amelia_train,data_Amelia_test),data_median,data_mice,data_irmi,data_knn)
   
-  # type_of_imputation <- list('Mediana/Moda','Mice','MissForest','MissMDA')
-  # datasets <- list(data_median,data_mice,data_missForest,data_missMDA)
+
   
-  type_of_imputation <- list('Mediana/Moda','softImpute', 'missMDA')
-  datasets <- list(data_median,data_softImpute, data_missMDA)
+  type_of_imputation <- list('Mediana/Moda','mice')
+  datasets <- list(data_median,data_mice)
+  
   
   
   return(list(type_of_imputation,datasets,train_set,test_set))
