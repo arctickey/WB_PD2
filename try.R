@@ -10,7 +10,7 @@ time_it <- function(impute_exp, time_limit){
   )
 }
 
-#Tak działa, jak Janek używał miejmy nadzieję dla wszystkich
+#Tak działa jak Janek używał miejmy nadzieję dla wszystkich
 # time_it({
 #   flag <- T
 #   x <- impute_softimpute(dataset)

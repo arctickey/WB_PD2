@@ -12,7 +12,11 @@ impute_missMDA <- function(df){
   #- lub po prostu nie działa (algorytm nie zbiega albo liczy zdecydowanie zbyt długo)
   
   num_of_components = tryCatch({
-    estim_ncpFAMD(df, ncp.max = 3, method.cv = "Kfold", nbsim = 5)$ncp
+    withTimeout(
+      estim_ncpFAMD(df, ncp.max = 3, method.cv = "Kfold", nbsim = 5)$ncp,
+      timeout = 360, # <<<< CZAS
+      onTimeout = "error"
+    )
   }, warning = function(c){
     message("WARN: estim_ncp (missMDA)")
     return(0)
@@ -23,9 +27,13 @@ impute_missMDA <- function(df){
   
   
   result_df = tryCatch({
+    withTimeout({
     df <- imputeFAMD(df, ncp = num_of_components)$completeObs
     message('missMDA successful')
-    return(df)
+    return(df)},
+    timeout = 100, # <<<< CZAS
+    onTimeout = "error"
+    )
   }, warning = function(c){
     message("WARN: impute FAIL (missMDA)")
     return(NA)
@@ -39,5 +47,5 @@ impute_missMDA <- function(df){
 
 # #Test
 # library(OpenML)
-# source("/home/piotr/Programowanie/WB/fork_grupy/2020L-WarsztatyBadawcze-Imputacja/datasets/openml_dataset_40536/code.R", chdir=TRUE)
+# source("/home/piotr/Programowanie/WB/fork_grupy/2020L-WarsztatyBadawcze-Imputacja/datasets/openml_dataset_41278/code.R", chdir=TRUE)
 # imputed_df <- impute_missMDA(dataset)

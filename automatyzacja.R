@@ -1,5 +1,9 @@
+#Biblioteki
+library(mlr3)
+library(tidyverse)
+
 #Wymaga podmiany reszta powinna działać
-path_to_datasets <- "/home/piotr/Programowanie/WB/fork_grupy/2020L-WarsztatyBadawcze-Imputacja/datasets"
+#path_to_datasets <- "/home/piotr/Programowanie/WB/fork_grupy/2020L-WarsztatyBadawcze-Imputacja/datasets"
 #path_to_datasets <- "/home/arctickey/2020L-WarsztatyBadawcze-Imputacja/datasets"
 
 scores = tibble(Dataset = numeric(),Method = character(),Score = numeric())
@@ -7,10 +11,13 @@ folder <- list.dirs(path_to_datasets)
 folder <- folder[-1]
 script_paths <- paste(folder, '/', 'code.R', sep='')
 
-for(i in script_paths){
+#Przeniosłem bo jak widzę nie czyścisz env po każdym zbiorze to może być raz wczytane
+source("./Imputation.R")
+loading()
+
+
+for(i in script_paths[8:9]){
   source(i, chdir = TRUE)
-  source("./Imputation.R")
-  loading()
   
   #Nie działa na zbiorach  29 - błędy w kodowaniu,
   # nie działa tez na 40536 i 41278 -  za duze
