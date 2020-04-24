@@ -26,9 +26,7 @@ all_imputation <- function(data,target){
   train_set = sample(nrow(data), 0.8 * nrow(data))
   test_set = setdiff(seq_len(nrow(data)), train_set)
   
-  noms <- names(Filter(is.factor, data))
-  #Printy do śledzenia postępu
-  
+ 
  
   ## soft wszystkie kolumny gdzie nie można uzyć pakietu chcę wypełniać modą 
   # zamknąłem w time_it dla bezpieczeństwa
@@ -86,10 +84,5 @@ all_imputation <- function(data,target){
 
   
 }
-
-
-
-
-#ifelse(class(dataset_raw) %in% c("character", "factor"),TRUE,FALSE)
 
 
