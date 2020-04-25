@@ -2,10 +2,11 @@
 library(mlr3)
 library(tidyverse)
 library(R.utils) 
+library(OpenML)
 #setwd('./WB_PD2')
 #Wymaga podmiany reszta powinna działać
 #path_to_datasets <- "/home/piotr/Programowanie/WB/fork_grupy/2020L-WarsztatyBadawcze-Imputacja/datasets"
-path_to_datasets <- "/home/arctickey/2020L-WarsztatyBadawcze-Imputacja/datasets"
+path_to_datasets <- "/home/jan/Pulpit/WB/2020L-WarsztatyBadawcze-Imputacja/datasets/"
 
 scores = tibble(Dataset = numeric(),Method = character(),Score = numeric())
 folder <- list.dirs(path_to_datasets)
@@ -32,8 +33,9 @@ for(i in script_paths){
   measure = msr("classif.acc")
   k = length(imput_result[[1]])
   j = 1
-  try(
+  
   while (j<=k){
+    try({
     task= TaskClassif$new(id =imput_result[[1]][[j]] , backend =imput_result[[2]][[j]], target = target_column)
     learner = lrn("classif.rpart",predict_type='prob')
     learner$train(task,row_ids = imput_result[[3]])
@@ -44,7 +46,10 @@ for(i in script_paths){
     j= j+1
   })
 }
-
+}
 colnames(scores) <- c('Dataset','Method','Score')
 scores
 #write.csv(scores, './wyniki.csv')
+
+
+
