@@ -4,31 +4,45 @@
 
 ### Abstract
 
-Missing observations in datasets used in machine learning models is a common and difficult problem. Most implementations of machine learning models, available in popular packages, are not prepared to deal with missing values. This requires user pre-processing of data. There are many suggestions to deal with this problem. Some solutions have been automated and are offered in publicly available packages for the R language. In our study, we tried to compare the quality of different methods of data imputation and their impact on the performance of machine learning models.\
+Missing observations in data sets used in machine learning models is a common and difficult problem. Most implementations of machine learning models, available in popular packages, are not prepared to deal with missing values. This requires user pre-processing of data. There are many suggestions to deal with this problem. Some solutions have been automated and are offered in publicly available packages for the R language. In our study, we tried to compare the quality of different methods of data imputation and their impact on the performance of machine learning models.\
 ...
 
 ### Introduction and Motivation
 
 #### Definition of missing data
 
-In the field of machine learning, one of the key objects is the data set. Real-world data are often incomplete, which prevents the use of many algorithms. Before creating a machine learning model, it is essential to solve the problem of missing observations. At the beginning, claryfing the definition of missing data is necessary. Missing data means that one or more variables have no data values in observations. This can be caused by various reasnons, which we can formally define as follows:
+In the field of machine learning, one of the key objects is the data set. Real-world data are often incomplete, which prevents the usage of many algorithms. Before creating a machine learning model, it is essential to solve the problem of missing observations. At the beginning, clariyfing the definition of missing data is necessary. Missing data means that one or more variables have no data values in observations. This can be caused by various reasons, which we can formally define as follows:
 
 - MCAR (Missing completely at random)\
-Values are missing completely at random if the events that lead to lack of value are independent both of observable variable and of unobservable parameters. The missing data are simply a random subset of the data. Analysis performed on MCAR data is unbiased, howewer data are rarely MCAR.
+Values are missing completely at random if the events that lead to lack of value are independent both of observable variable and of unobservable parameters. The missing data are simply a random subset of the data. Analysis performed on MCAR data is unbiased. However, data are rarely MCAR.
 - MAR (Missing at random)\
 Missingness of the values can be fully explained by complete variables. In other words, missing data are not affected by their characteristic, but are related to some or all of observed data. This is the most common assumption about missing data.
-- MNR (Missing not at random)\
+- MNAR (Missing not at random)\
 When data are missing not at random, the missingness is related to the characteristic of variable itself.
 
 #### Techniques of dealing with missing data
 
-In case of preparing a data set for machine learning models we can generally distinguish two approaches. The first method is **omission**. From the data set we can remove observations with at least one missing value or we can remove whole variables where missing values are present. This strategy is appropriate if the features are MCAR. However, it is frequently used also when this assumption is not met. It is also useless when the percentage of missing values is high. The second approach is **imputation**, where values are filled in the place of missing data. There are many methods of imputation, which we can divide into two groups. **Single imputation** techniques use information of one variable with missing values. Popular method is filling missings with mean, median or mode of no missing values. More advanced are predictions from regression models which are applied on the mean and covariance matrix estimated by analysis of complete cases. The main disadvatage of single imputation is treating the imputed value as true value. This method does not take into account the uncertainty of the missing value prediction. For this reason **multiple imputation** was proposed. This method imputes *k* values, which leads to creating *k* complete data sets. The analysis or model is applied on each complete data set and finally results are consolidated. This approach keeps the uncertainty about the range of values which the true value 
-could have taken. Additionally, multiple imputation can be used in both cases of MCAR and MAR data.
+In case of preparing a data set for machine learning models we can generally distinguish two approaches. The first method is **omission**. From the data set we can remove observations with at least one missing value or we can remove whole variables where missing values are present. This strategy is appropriate if the features are MCAR. However, it is frequently used also when this assumption is not met. It is also useless when the percentage of missing values is high. The second approach is **imputation**, where values are filled in the place of missing data. There are many methods of imputation, which we can divide into two groups. **Single imputation** techniques use information of one variable with missing values. Popular method is filling missings with mean, median or mode of no missing values. More advanced are predictions from regression models which are applied on the mean and covariance matrix estimated by analysis of complete cases. The main disadvantage of single imputation is treating the imputed value as true value. This method does not take into account the uncertainty of the missing value prediction. For this reason **multiple imputation** was proposed. This method imputes *k* values, which leads to creating *k* complete data sets. The analysis or model is applied on each complete data set and finally results are consolidated. This approach keeps the uncertainty about the range of values which the true value could have taken. Additionally, multiple imputation can be used in both cases of MCAR and MAR data.
+
+#### Motivation
+
+Various imputation techniques are implemented in different packages for the R language. Their performance is often analyzed independently and only in terms of imputation alone. Because of variety of available tools, it becomes uncertain which one package and method to use, when complete data set is needed for machine learning model. In our study we would like to examine, how methods offered by some popular packages perform on various data sets. We want to consider flexibility of these packages to deal with different data sets. The most important issue for us is the impact of performed imputation on later machine learning model performance. We are going to consider one specific type of machine learning tasks: *supervised binary classification*. Our aim is a comparison of metrics scores achieved by various models depending on chosen imputation method. 
 
 ### Related Work
 
+Tutaj się chwalimy ile bełkotu innych osób przeczytaliśmy, żeby teraz napisać własne brednie dokładnie na ten sam temat.
 
 ### Methodology
+
+#### Packages and methods chosen for research
+For our study we decided to chose four packages designed for missing data imputation in R language and one self implemented basic technique:
+
+- **Mode and median**: Simple technique of filling missing values with mode (for categorical variables) and median (for continuous variables) of complete values in variable. Implemented with basic R language functions.
+- **mice**: Package allows to perform multivariate imputation by chained equations (MICE), which is a type of multiple imputation. Works on data sets with both categorical and continuous variables.
+- **missMDA**: Package for missing values imputation both for categorical and continuous variables. Data sets with mix variables are imputed with regularized iterative FAMD algorithm (factorial analysis for mixed data).
+- **missFOREST**: Package can be used for imputation categorical and continuous data with predictions of random forest model, trained on complete observations. Package works on data with complex interactions and non-linear relations.
+- **softImpute**: Package for matrix imputation with nuclear-norm regularization and soft-thresholded SVD algorithm. Works only with continuous variables.
+- **VIM**: Package for visualization and imputation of missing values. In our study function for iterative robust model-based imputation (IRMI) is used.
 
 For test purposes we used 9 dataset form OpenMl library ,available here https://www.openml.org/search?type=data. Every datasets are designed for binary classification and most of them contains numerical and categorical features.  
 
@@ -50,6 +64,7 @@ Last method which we used is missMDA alsow can be use to impute numeric and cate
 After imputation we add back target varibale to both sets.
 
 To make prediction we use 'classif.rpart' method form mrl packege. It's inplementation of Decision Tree algorithm thats mean dataset dont required encoding becouse decision tree acept categoricar variables. To evaluated imputation method, classifier was trained on train set end test on test set. In this experiment we skip cross-validation step decision tree used default parametrs. For model evaluation we used 4 diffrent metric accuracy,AUC,precison and reccal. Most important was precison and reccal becouse some of datasets was vary unblanced. 
+
 ### Results
 
 
