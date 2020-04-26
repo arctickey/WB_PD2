@@ -14,7 +14,26 @@ Reproducibility of scientific papers is one of the most important...
 
 ### Methodology
 
+For test purposes we used 9 dataset form OpenMl library ,available here https://www.openml.org/search?type=data. Every datasets are designed for binary classification and most of them contains numerical and categorical features.  
 
+Before imputacien datasets are prepared. Preperation are diffrent for each dataset but always include:
+<ol>
+<li>Checking for typos and correcting them.</li>
+<li>Categorical veriable are convert to lowercase if it's reduce number of unique categories.</li>
+<li>Removing columns if it isnt containing any information (for example all observation have the same value).</li>
+<li>Features like date or location are transform to help algoritm understand them (date for example is splited to three column 'year' , 'day' , 'month').</li>
+</ol>
+
+From prepered datasets we remove target varible and split dataset to train and test sets in proportion 4/1 respectively. Split is perform coplytly random and stay the same for all types of imputation. Missing data are imputed separately for train and test set.\
+First we use Mode/median inputation where every categorical varible is imputed by mode and every numeric by median. It is very simple methode and its use as base result for more complex algoritm to imporve.\
+SoftImput package works only for numeric features to compere theme with othere algoritm on the same data we use SoftImput for numeric variable and mode for categorical variable. Alternativly its posible to use SoftImput for numeric featurs and some othere algoritm for categorical but we decided this approach can lead to unreliable results.\
+MissForest algoritm can be use on both numeric and categorical featues and can perform imputation without help of other methods.\
+Inputation method from Mice package alsow can be run on all types of data.\
+Iterative Robust Model-Based Imputation method form VIM package can impute all types of data. This method additionally create new columns with informacion whether observation was imputed or was't. We decidet to dont use this columns becouse other methods dont create them.\
+Last method which we used is missMDA alsow can be use to impute numeric and categorical features.\
+After imputation we add back target varibale to both sets.
+
+To make prediction we use 'classif.rpart' method form mrl packege. It's inplementation of Decision Tree algorithm thats mean dataset dont required encoding becouse decision tree acept categoricar variables. To evaluated imputation method, classifier was trained on train set end test on test set. In this experiment we skip cross-validation step decision tree used default parametrs. For model evaluation we used 4 diffrent metric accuracy,AUC,precison and reccal. Most important was precison and reccal becouse some of datasets was vary unblanced. 
 ### Results
 
 
