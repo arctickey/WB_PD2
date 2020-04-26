@@ -1,0 +1,23 @@
+## Title of the article
+
+*Authors: Jan Borowski, Piotr Fic, Filip Chrzuszcz (Warsaw University of Technology)*
+
+### Abstract
+
+
+### Introduction and Motivation
+
+Reproducibility of scientific papers is one of the most important...
+
+### Related Work
+
+
+### Methodology
+
+
+### Results
+
+
+### Summary and conclusions 
+
+
