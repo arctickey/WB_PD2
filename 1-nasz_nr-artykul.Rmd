@@ -1,4 +1,4 @@
-## Title of the article
+## Various data imputation techniques in R
 
 *Authors: Jan Borowski, Filip Chrzuszcz, Piotr Fic  (Warsaw University of Technology)*
 
