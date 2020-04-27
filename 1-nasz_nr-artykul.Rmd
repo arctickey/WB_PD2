@@ -46,27 +46,79 @@ For our study we decided to chose four packages designed for missing data imputa
 
 For test purposes we used 9 dataset form OpenMl library ,available here https://www.openml.org/search?type=data. Every datasets are designed for binary classification and most of them contains numerical and categorical features.  
 
-Before imputacien datasets are prepared. Preperation are diffrent for each dataset but always include:
+Before imputacien datasets are prepared. Preperation are different for each dataset but always include:
 <ol>
 <li>Checking for typos and correcting them.</li>
-<li>Categorical veriable are convert to lowercase if it's reduce number of unique categories.</li>
-<li>Removing columns if it isnt containing any information (for example all observation have the same value).</li>
+<li>Categorical veriable are convert to lowercase when  it reduce number of unique categories.</li>
+<li>Removing columns if they are not containing any information (for example all observation have the same value).</li>
 <li>Features like date or location are transform to help algoritm understand them (date for example is splited to three column 'year' , 'day' , 'month').</li>
 </ol>
 
-From prepered datasets we remove target varible and split dataset to train and test sets in proportion 4/1 respectively. Split is perform coplytly random and stay the same for all types of imputation. Missing data are imputed separately for train and test set.\
-First we use Mode/median inputation where every categorical varible is imputed by mode and every numeric by median. It is very simple methode and its use as base result for more complex algoritm to imporve.\
-SoftImput package works only for numeric features to compere theme with othere algoritm on the same data we use SoftImput for numeric variable and mode for categorical variable. Alternativly its posible to use SoftImput for numeric featurs and some othere algoritm for categorical but we decided this approach can lead to unreliable results.\
-MissForest algoritm can be use on both numeric and categorical featues and can perform imputation without help of other methods.\
-Inputation method from Mice package alsow can be run on all types of data.\
-Iterative Robust Model-Based Imputation method form VIM package can impute all types of data. This method additionally create new columns with informacion whether observation was imputed or was't. We decidet to dont use this columns becouse other methods dont create them.\
-Last method which we used is missMDA alsow can be use to impute numeric and categorical features.\
+From prepered datasets we remove target variable and split dataset to train and test sets in proportion 4/1 respectively. Split is perform randomly and do stay the same for all types of imputation. Missing data are imputed separately for train and test set.\
+First we use Mode/median inputation where every categorical varible is imputed by mode and every numeric by median. It is very simple method and it is used as base result for more complex algoritm to improve.\
+SoftImpute package works only with numeric features to compere theme with othere algoritm on the same data we use SoftImput for numeric variable and mode for categorical variable. Alternativly it is possible to use SoftImpute for numeric features and different alghoritm for categorical variables, but we decided that this approach may lead to unreliable results.\
+MissForest algoritm can be use on both numeric and categorical featues and is capable of  performing imputation without any help of other methods.\
+Inputation method from Mice package also can be run on all types of data.\
+Iterative Robust Model-Based Imputation method form VIM package can impute all types of data. This method additionally create new columns with informacion whether observation was imputed or not. We decidet to do not use these columns, because other methods do not create them.\
+Last method which we covered is missMDA which also can be use to imput numeric and categorical features.\
 After imputation we add back target varibale to both sets.
 
-To make prediction we use 'classif.rpart' method form mrl packege. It's inplementation of Decision Tree algorithm thats mean dataset dont required encoding becouse decision tree acept categoricar variables. To evaluated imputation method, classifier was trained on train set end test on test set. In this experiment we skip cross-validation step decision tree used default parametrs. For model evaluation we used 4 diffrent metric accuracy,AUC,precison and reccal. Most important was precison and reccal becouse some of datasets was vary unblanced. 
+To make prediction we use 'classif.rpart' method form mlr packege. It is an inplementation of a Decision Tree algorithm, which is capable of working with categorical data, so that we did not have to encode it. To evaluate imputation methods, classifier was trained on train set and tested on test set. In this experiment we have skipped cross-validation step. For model evaluation we used 4 diffrent metrics: accuracy AUC,precison and recall. We found precision and recall as most valuable for us, as some datasets were quite unbalanced.
 
 ### Results
 
+After the long and tedious process of data imputation it is finally time to evaluate our methods of imputation. Methods were trained and tested on 11 datasets and evaluated strictly using these 4 methods mentioned earlier. Before score analysis it is worth mentioning that all alghortims were tested with basic parametres, so there is certainly some room for improvementm but for now we decided to leave these scores as they are.
+```{r echo=FALSE, message=FALSE, warning=FALSE , results='asis'}
+library(knitr)
+library(tidyverse)
+scores <- readr::read_csv('./wyniki_moje.csv')
+
+ramka <- scores %>% group_by(Method) %>% summarise(acc = round(mean(Acc),2),
+                                          auc = round(mean(Auc),2),
+                                          precision = round(mean(Precision),2),
+                                          recall = round(mean(Recall),2))
+
+knitr::kable(ramka,caption='Scores of imputation methods')
+```
+
+Our experiment definately did not find out the best imputation alghoritm, but we can derive some interesting conclusions from it.
+First of all, we are going to treat median imputation as kind of a baseline for our alghoritms. Suprisngly it seems to perform quite well, amongst the others, often quite sophisticated methods. It achieved over 80% of accuracy on average. However, it is hard to decide whether it is a high score or not, because we are only able to compare alghortims between the others. To say anything more meanigful about our methods we shall look at the distribution of the scores in order to make a better analysis of performance.\
+
+
+#### ROC AUC score
+
+As mentioned earlier we decided to use a few metrics to compare alghortims. One of it is ROC AUC score. It is a measure which caluclates TPR (which is ratio beetwen our predicted positive examples over overall amount of positive examples) and FPR (which is ratio beetwen false positives and all negative examples). Next TPR and FPR are evaluated at different thershold values and than we have something called ROC curve. Our measure is simply the area under that curve. Obviously the maximum of that score is 1. ROC AUC is also quite good for working with imbalanced sets, which may be useful for us, because we had to deal with such in our experiment.
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+p<-ggplot(scores, aes(x=Method, y=Auc, color=Method)) +
+  geom_boxplot()+theme_minimal()+labs(x="",y="")+ggtitle("ROC AUC among different imputations")
+p
+```
+
+Taking a brief look at the distributions of the scores it is clear that median is not so good. Its scores seems to vary the most among datasets, which is not something we ideally want. Also it is worth noting that unfortunately missMDA achieved the worse score and also was the most problematic imputation technic from which we tested. It did not manage the perform its imputations on 5 out of 11 datasets, which clearly disqualify this method from everyday usage. Also softimpute had problem with working on all sets, albeit it managed to perform quite decent scores. On the other end are VIM irmi, missFOREST and Mice. All of these three packages managed to make imputations on all sets, and achieved good scores.
+
+#### Precision and recall
+Moving further into score analysis we need to focus on two undeniably important parameters, which are precision and recall. We can understand recall as an ability of a model to find all the relevant cases within a dataset, while precision  expresses the proportion of the data our model says was relevant actually were relevant. Ideally we would like to make both of these metrics as high, as possible, which is of course not so possible. Instead we can focus on one of these two depending what problem we are solving. However, in our experiment we are not capable to say which metric is more important for us, so we can simply compare them, and on that basis say something about our methods.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE,fig.width=4.5,fig.height=5,fig.show='hold'}
+p<-ggplot(scores, aes(x=Method, y=Precision, color=Method)) +
+  geom_boxplot()+theme_minimal()+labs(x="",y="")+ggtitle("Precision among different imputations")
+p1<-ggplot(scores, aes(x=Method, y=Recall, color=Method)) +
+  geom_boxplot()+theme_minimal()+labs(x="",y="")+ggtitle("Recall among different imputations")
+p
+p1
+```
+
+We can now focus on brief analysis of the best scores, which our methods managed to achieve. In terms of precision VIM irmi, missFOREST and Mice achieved almost the same scores, with Mice having the most compact scores. Despite that scores quite comparable with these which we have seen on ROC AUC scores, so it will be more interesting to move on for recall scores. Here once again VIM irmi leads with the highest median of scores, however ironically median imputing has the second median of scores here. After looking at its scores, we can derive our first bold conclusion. Namely it is worth to use median imputation when we aim for decent scores and do not care about dispersion of it. Quite simmilary to the previous scores mice and missFOREST were close to the leaders and softImpute and missMDA were at the back of the field.
+
+#### Time of imputations
+
+The last topic we wish to consider in our analysis section is the time of imputations. It is quite significant, because even the best imputation may become redundant if it has too long working time.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE,fig.width=4.5,fig.height=5,fig.show='hold'}
+p<-ggplot(scores, aes(x=Method, y=Time, color=Method)) +
+  geom_boxplot()+theme_minimal()+labs(x="",y="")+ggtitle("Precision among different imputations")
+p1
+```
 
 ### Summary and conclusions 
 
