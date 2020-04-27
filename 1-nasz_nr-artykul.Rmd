@@ -4,8 +4,7 @@
 
 ### Abstract
 
-Missing observations in data sets used in machine learning models is a common and difficult problem. Most implementations of machine learning models, available in popular packages, are not prepared to deal with missing values. This requires user pre-processing of data. There are many suggestions to deal with this problem. Some solutions have been automated and are offered in publicly available packages for the R language. In our study, we tried to compare the quality of different methods of data imputation and their impact on the performance of machine learning models.\
-...
+Missing observations in data sets used in machine learning models is a common and difficult problem. Most implementations of machine learning models, available in popular packages, are not prepared to deal with missing values. This requires user pre-processing of data. There are many suggestions to deal with this problem. Some solutions have been automated and are offered in publicly available packages for the R language. In our study, we tried to compare the quality of different methods of data imputation and their impact on the performance of machine learning models. We scored different algorithms on various data sets imputed by chosen packages. Results summary presents packages which enabled to achive the best models predictions metrics. Moreover, duration of imputation was measured to compare it among methods and in relation with metrics values. 
 
 ### Introduction and Motivation
 
@@ -28,57 +27,53 @@ In case of preparing a data set for machine learning models we can generally dis
 
 Various imputation techniques are implemented in different packages for the R language. Their performance is often analyzed independently and only in terms of imputation alone. Because of variety of available tools, it becomes uncertain which one package and method to use, when complete data set is needed for machine learning model. In our study we would like to examine, how methods offered by some popular packages perform on various data sets. We want to consider flexibility of these packages to deal with different data sets. The most important issue for us is the impact of performed imputation on later machine learning model performance. We are going to consider one specific type of machine learning tasks: *supervised binary classification*. Our aim is a comparison of metrics scores achieved by various models depending on chosen imputation method. 
 
-### Related Work
-
-Tutaj się chwalimy ile bełkotu innych osób przeczytaliśmy, żeby teraz napisać własne brednie dokładnie na ten sam temat.
-
 ### Methodology
 
 #### Packages and methods chosen for research
 For our study we decided to chose four packages designed for missing data imputation in R language and one self implemented basic technique:
 
 - **Mode and median**: Simple technique of filling missing values with mode (for categorical variables) and median (for continuous variables) of complete values in variable. Implemented with basic R language functions.
-- **mice**: Package allows to perform multivariate imputation by chained equations (MICE), which is a type of multiple imputation. Works on data sets with both categorical and continuous variables.
-- **missMDA**: Package for missing values imputation both for categorical and continuous variables. Data sets with mix variables are imputed with regularized iterative FAMD algorithm (factorial analysis for mixed data).
-- **missFOREST**: Package can be used for imputation categorical and continuous data with predictions of random forest model, trained on complete observations. Package works on data with complex interactions and non-linear relations.
-- **softImpute**: Package for matrix imputation with nuclear-norm regularization and soft-thresholded SVD algorithm. Works only with continuous variables.
-- **VIM**: Package for visualization and imputation of missing values.
+- **mice**: Package allows to perform multivariate imputation by chained equations (MICE), which is a type of multiple imputation. The method is based on Fully Conditional Specification, where each incomplete variable is imputed by separate model.
+- **missMDA**: Package for multiple missing values imputation. Data sets are imputed with the principal component method, regularized iterative FAMD algorithm (factorial analysis for mixed data). First estimation of the number of dimensions for factorial analysis is essential.
+- **missFOREST**: Package can be used for imputation with predictions of random forest model, trained on complete observations. Package works on data with complex interactions and non-linear relations. Enables parallel calculations.
+- **softImpute**: Package for matrix imputation with nuclear-norm regularization. Algorithm works like EM, solving optimization problem using soft-thresholded SVD algorithm.  Works only with continuous variables.
+- **VIM**: Package for visualization and imputation of missing values. Offers iterative robust model-based imputation (IRMI). In each iteration, one variable is used as response variable and remaining variables as the regressors.
 
-For test purposes we used 9 dataset form OpenMl library ,available here https://www.openml.org/search?type=data. Every datasets are designed for binary classification and most of them contains numerical and categorical features.  
+For test purposes we used 11 dataset form OpenML library, available here https://www.openml.org/search?type=data. Every dataset is designed for binary classification and most of them contains numerical and categorical features.  
 
-Before imputacien datasets are prepared. Preperation are different for each dataset but always include:
+Before imputacien datasets are prepared. Preperations are different for each dataset, but always include:
 
 - Checking for typos and correcting them.
-- Categorical veriable are convert to lowercase when  it reduce number of unique categories.
-- Removing columns if they are not containing any information (for example all observation have the same value).
-- Features like date or location are transform to help algoritm understand them (date for example is splited to three column 'year' , 'day' , 'month').
+- Categorical veriables are converted to lowercase when it reduces number of unique categories.
+- Removing columns, if they do not contain any information (for example all observation have the same value).
+- Features like date or location are transformed to help algorithm understand them (date for example is splited to three columns: 'year' , 'day' , 'month').
 
 
-From prepered datasets we remove target variable and split dataset to train and test sets in proportion 4/1 respectively. Split is performed randomly and do stay the same for all types of imputation. Missing data are imputed separately for train and test set. 
-First we use Mode/median inputation it is very simple method and it is used as base result for more complex algoritm to improve.
-SoftImpute package works only with numeric features to compere theme with othere algoritm on the same data we use SoftImput for numeric variable and mode for categorical variable. Alternativly it is possible to use SoftImpute for numeric features and different algorihtm for categorical variables, but we decided that this approach may lead to unreliable results.
-MissForest algoritm can be use on both numeric and categorical featues and is capable of  performing imputation without any help of other methods.
+From prepered datasets we remove target variable and split dataset to train and test sets in proportion 4/1 respectively. Split is performed randomly and do stay the same for all types of imputation. Missing data are imputed separately for train and test set.  
+First we use mode/median imputation, which is a very simple method and it is used as base result for more complex algoritm to compare.
+SoftImpute package works only with numeric features. To compere it with othere algorithms on the same data we use SoftImput for numeric variables and mode for categorical variables. Alternativly, it is possible to use SoftImpute for numeric features and different algorihtm for categorical variables, but we decided that this approach may lead to unreliable results.
+MissForest algorithm can be used on both numeric and categorical featues and is capable of performing imputation without any help of other methods.
 Inputation method from Mice package also can be run on all types of data.
-Iterative Robust Model-Based Imputation method form VIM package can impute all types of data. This method additionally create new columns with informacion whether observation was imputed or not. We decidet to do not use these columns, because other methods do not create them.
-Last method which we covered is missMDA which also can be use to imput numeric and categorical features.
+Iterative Robust Model-Based Imputation method from VIM package can impute all types of data. This method additionally create new columns with information whether observation was imputed or not. We decided to do not use these columns, because other methods do not create them.
+Last method which we covered is missMDA which also can be used to imput numeric and categorical features.
 After imputation we add back target varibale to both sets.
 
-To make prediction we use 'classif.rpart' method form mlr packege. It is an inplementation of a Decision Tree algorithm, which is capable of working with categorical data, so that we did not have to additionaly encode it. To evaluate imputation methods, classifier was trained on train set and tested on test set. In this experiment we have skipped cross-validation step. For model evaluation we used 4 diffrent metrics: accuracy AUC,precison and recall. We found precision and recall as most valuable for us, as some datasets were quite unbalanced.
+To make prediction we use 'classif.rpart' method form mlr packege. It is an inplementation of a Decision Tree algorithm, which is capable of working with categorical data, so that we did not have to additionaly encode it. To evaluate imputation methods, classifier was trained on train set and tested on test set. In this experiment we have skipped cross-validation step. For model evaluation we used 4 diffrent metrics: accuracy, AUC, precison and recall. We found precision and recall as most valuable for us, as some datasets were quite unbalanced.
 
 ### Results
 
-After the long and tedious process of data imputation it is finally time to evaluate our methods of imputation. Methods were trained and tested on 11 datasets and evaluated strictly using these 4 methods mentioned earlier. Before score analysis it is worth mentioning that all algorithms were tested with basic parametres, so there is certainly some room for improvementm but for now we decided to leave these scores as they are.
+After the long and tedious process of data imputation it is finally time to evaluate our methods of imputation. Methods were trained and tested on 11 datasets and evaluated strictly using these 4 methods mentioned earlier. Before score analysis it is worth mentioning that all algorithms were tested with basic parametres, so there is certainly some room for improvementm but for now we decided to leave these scores as they are. Table below presents average metrics achieved by model, depending on imputation method.
 ```{r echo=FALSE, message=FALSE, warning=FALSE , results='asis'}
 library(knitr)
 library(tidyverse)
 scores <- readr::read_csv('./wyniki_moje.csv')
 
-ramka <- scores %>% group_by(Method) %>% summarise(acc = round(mean(Acc),2),
+ramka <- scores %>% group_by(Method) %>% summarise(accuracy = round(mean(Acc),2),
                                           auc = round(mean(Auc),2),
                                           precision = round(mean(Precision),2),
                                           recall = round(mean(Recall),2))
 
-knitr::kable(ramka,caption='Scores of imputation methods')
+knitr::kable(ramka,caption='Average scores of model on imputation methods')
 ```
 
 Our experiment definately did not find out the best imputation algoriithm, but we can derive some interesting conclusions from it.
@@ -132,4 +127,6 @@ Algorithms from that group had that quite high, which may be unacceptable while 
 
 ### Summary and conclusions 
 
-
+Considering metrics scores achieved by evaluated model few important conlusions about imputation methods can be made. Basic approach with median and mode imputation allows to get decent results of machine learning model. Its disadvatage is large discrepancy in scores. More complex techniques available in packages, ensure more stable results of model among all data sets. From them, we can distinguish missFOREST, VIM irmi and mice. These packages have carried out the best imputation in terms of further model performance. They proved to be the most versatile, achiving the best average results of accuracy. VIM and missFOREST AUC scores show also the stability of model performance on imputed data set. SoftImpute package caused too low scores of recall and precision which suggests its poor performance on unbalanced data. MissMDA package performed worse than basic mode/median and all other methods, being able to proceed only on 6 from 11 data sets.  
+Second aspect to consider is time needed for imputation. MissFOREST achieved good metrics scores of model, but its very time consuming. Both VIM irmi and mice packages not only provided well imputed data sets but also were time efficient.  
+Choosing the best imputation tool may obviously depend on characteristic of the specific data sets, however our research should help to find flexible solution for everyday usage.
