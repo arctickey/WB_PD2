@@ -42,25 +42,25 @@ For our study we decided to chose four packages designed for missing data imputa
 - **missMDA**: Package for missing values imputation both for categorical and continuous variables. Data sets with mix variables are imputed with regularized iterative FAMD algorithm (factorial analysis for mixed data).
 - **missFOREST**: Package can be used for imputation categorical and continuous data with predictions of random forest model, trained on complete observations. Package works on data with complex interactions and non-linear relations.
 - **softImpute**: Package for matrix imputation with nuclear-norm regularization and soft-thresholded SVD algorithm. Works only with continuous variables.
-- **VIM**: Package for visualization and imputation of missing values. In our study function for iterative robust model-based imputation (IRMI) is used.
+- **VIM**: Package for visualization and imputation of missing values.
 
 For test purposes we used 9 dataset form OpenMl library ,available here https://www.openml.org/search?type=data. Every datasets are designed for binary classification and most of them contains numerical and categorical features.  
 
 Before imputacien datasets are prepared. Preperation are different for each dataset but always include:
-<ol>
-<li>Checking for typos and correcting them.</li>
-<li>Categorical veriable are convert to lowercase when  it reduce number of unique categories.</li>
-<li>Removing columns if they are not containing any information (for example all observation have the same value).</li>
-<li>Features like date or location are transform to help algoritm understand them (date for example is splited to three column 'year' , 'day' , 'month').</li>
-</ol>
 
-From prepered datasets we remove target variable and split dataset to train and test sets in proportion 4/1 respectively. Split is performed randomly and do stay the same for all types of imputation. Missing data are imputed separately for train and test set.\
-First we use Mode/median inputation where every categorical varible is imputed by mode and every numeric by median. It is very simple method and it is used as base result for more complex algoritm to improve.\
-SoftImpute package works only with numeric features to compere theme with othere algoritm on the same data we use SoftImput for numeric variable and mode for categorical variable. Alternativly it is possible to use SoftImpute for numeric features and different algorihtm for categorical variables, but we decided that this approach may lead to unreliable results.\
-MissForest algoritm can be use on both numeric and categorical featues and is capable of  performing imputation without any help of other methods.\
-Inputation method from Mice package also can be run on all types of data.\
-Iterative Robust Model-Based Imputation method form VIM package can impute all types of data. This method additionally create new columns with informacion whether observation was imputed or not. We decidet to do not use these columns, because other methods do not create them.\
-Last method which we covered is missMDA which also can be use to imput numeric and categorical features.\
+- Checking for typos and correcting them.
+- Categorical veriable are convert to lowercase when  it reduce number of unique categories.
+- Removing columns if they are not containing any information (for example all observation have the same value).
+- Features like date or location are transform to help algoritm understand them (date for example is splited to three column 'year' , 'day' , 'month').
+
+
+From prepered datasets we remove target variable and split dataset to train and test sets in proportion 4/1 respectively. Split is performed randomly and do stay the same for all types of imputation. Missing data are imputed separately for train and test set. 
+First we use Mode/median inputation it is very simple method and it is used as base result for more complex algoritm to improve.
+SoftImpute package works only with numeric features to compere theme with othere algoritm on the same data we use SoftImput for numeric variable and mode for categorical variable. Alternativly it is possible to use SoftImpute for numeric features and different algorihtm for categorical variables, but we decided that this approach may lead to unreliable results.
+MissForest algoritm can be use on both numeric and categorical featues and is capable of  performing imputation without any help of other methods.
+Inputation method from Mice package also can be run on all types of data.
+Iterative Robust Model-Based Imputation method form VIM package can impute all types of data. This method additionally create new columns with informacion whether observation was imputed or not. We decidet to do not use these columns, because other methods do not create them.
+Last method which we covered is missMDA which also can be use to imput numeric and categorical features.
 After imputation we add back target varibale to both sets.
 
 To make prediction we use 'classif.rpart' method form mlr packege. It is an inplementation of a Decision Tree algorithm, which is capable of working with categorical data, so that we did not have to additionaly encode it. To evaluate imputation methods, classifier was trained on train set and tested on test set. In this experiment we have skipped cross-validation step. For model evaluation we used 4 diffrent metrics: accuracy AUC,precison and recall. We found precision and recall as most valuable for us, as some datasets were quite unbalanced.
