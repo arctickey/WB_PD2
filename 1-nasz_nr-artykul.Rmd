@@ -35,12 +35,13 @@ In case of preparing a data set for machine learning models we can generally dis
 For our study we decided to chose four packages designed for missing data imputation in R language and one self implemented basic technique:
 
 - **Mode and median**: Simple technique of filling missing values with mode (for categorical variables) and median (for continuous variables) of complete values in variable. Implemented with basic R language functions.
-- **mice**: Package allows to perform multivariate imputation by chained equations (MICE), which is a type of multiple imputation. The method is based on Fully Conditional Specification, where each incomplete variable is imputed by separate model.
-- **missMDA**: Package for multiple missing values imputation. Data sets are imputed with the principal component method, regularized iterative FAMD algorithm (factorial analysis for mixed data). First estimation of the number of dimensions for factorial analysis is essential.
-- **missFOREST**: Package can be used for imputation with predictions of random forest model, trained on complete observations. Package works on data with complex interactions and non-linear relations. Enables parallel calculations.
-- **softImpute**: Package for matrix imputation with nuclear-norm regularization. Algorithm works like EM, solving optimization problem using soft-thresholded SVD algorithm.  Works only with continuous variables.
-- **VIM**: Package for visualization and imputation of missing values. Offers iterative robust model-based imputation (IRMI). In each iteration, one variable is used as response variable and remaining variables as the regressors.
+- **mice**[[2]](https://cran.r-project.org/web/packages/mice/mice.pdf): Package allows to perform multivariate imputation by chained equations (MICE), which is a type of multiple imputation. The method is based on Fully Conditional Specification, where each incomplete variable is imputed by separate model.
+- **missMDA**[[3]](https://cran.r-project.org/web/packages/missMDA/missMDA.pdf): Package for multiple missing values imputation. Data sets are imputed with the principal component method, regularized iterative FAMD algorithm (factorial analysis for mixed data). First estimation of the number of dimensions for factorial analysis is essential.
+- **missFOREST**[[4]](https://cran.r-project.org/web/packages/missForest/missForest.pdf): Package can be used for imputation with predictions of random forest model, trained on complete observations. Package works on data with complex interactions and non-linear relations. Enables parallel calculations.
+- **softImpute**[[5]](https://cran.r-project.org/web/packages/softImpute/softImpute.pdf): Package for matrix imputation with nuclear-norm regularization. Algorithm works like EM, solving optimization problem using soft-thresholded SVD algorithm.  Works only with continuous variables.
+- **VIM**[[6]](https://cran.r-project.org/web/packages/VIM/VIM.pdf): Package for visualization and imputation of missing values. Offers iterative robust model-based imputation (IRMI). In each iteration, one variable is used as response variable and remaining variables as the regressors.
 
+#### Data source and preparation
 For test purposes we used 11 dataset form OpenML library, available here https://www.openml.org/search?type=data. Every dataset is designed for binary classification and most of them contains numerical and categorical features.  
 
 Before imputacien datasets are prepared. Preperations are different for each dataset, but always include:
@@ -50,7 +51,7 @@ Before imputacien datasets are prepared. Preperations are different for each dat
 - Removing columns, if they do not contain any information (for example all observation have the same value).
 - Features like date or location are transformed to help algorithm understand them (date for example is splited to three columns: 'year' , 'day' , 'month').
 
-
+#### Implementation details
 From prepered datasets we remove target variable and split dataset to train and test sets in proportion 4/1 respectively. Split is performed randomly and do stay the same for all types of imputation. Missing data are imputed separately for train and test set.  
 First we use mode/median imputation, which is a very simple method and it is used as base result for more complex algoritm to compare.
 SoftImpute package works only with numeric features. To compere it with othere algorithms on the same data we use SoftImput for numeric variables and mode for categorical variables. Alternativly, it is possible to use SoftImpute for numeric features and different algorihtm for categorical variables, but we decided that this approach may lead to unreliable results.
@@ -60,6 +61,8 @@ Iterative Robust Model-Based Imputation method from VIM package can impute all t
 Last method which we covered is missMDA which also can be used to imput numeric and categorical features.
 After imputation we add back target varibale to both sets.
 
+
+#### Model training and evaluation
 To make prediction we use 'classif.rpart' method form mlr packege. It is an inplementation of a Decision Tree algorithm, which is capable of working with categorical data, so that we did not have to additionaly encode it. To evaluate imputation methods, classifier was trained on train set and tested on test set. In this experiment we have skipped cross-validation step. For model evaluation we used 4 diffrent metrics: accuracy, AUC, precison and recall. We found precision and recall as most valuable for us, as some datasets were quite unbalanced.
 
 ### Results
