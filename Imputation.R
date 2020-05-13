@@ -41,7 +41,7 @@ all_imputation <- function(data,target){
   data_softImpute <- r[order(ord), ]
   time_softImpute <- Sys.time() - time_softImpute
   print('softImpute successful')
-  data_softImpute[,target] <- target_col[order(ord)]
+  data_softImpute[,target] <- target_col
 
   # missForest z tego co patrzyłem ogarniał wszyskie rodzaje zmiennych ale długo działa 
   time_forest <- Sys.time()
