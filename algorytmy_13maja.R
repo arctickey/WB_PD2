@@ -115,24 +115,30 @@ learining <- function(target, data_encoding, data_no_encoding, train_index, test
     #RADNOM FOREST
     discrete_ps = makeParamSet(
       makeDiscreteParam("num.trees", values = c(100, 200, 300,400,500,600)),
-      makeDiscreteParam('min.node.size',values = c(1,2,3,4,5))
-
-     # makeDiscreteParam('max.depth',values = c(0.5,1))
+      makeDiscreteParam('min.node.size',values = c(1,2,3,4,5)),
+      makeDiscreteParam('mtry', sample(seq(2, ncol(data_encoding)-1), 4))
+      #makeDiscreteParam('max.depth',values = c(0.5,1))
       )
 
     if (encoding_where_unnessesery){
-      res_rf <- cv_tuning(train_task_encoded,'classif.ranger',  discrete_ps )} else { res_rf<- cv_tuning(train_task_no_encoded,'classif.ranger',discrete_ps)}
+      res_rf <- cv_tuning(train_task_encoded,'classif.ranger',  discrete_ps )} 
+    else { 
+      res_rf<- cv_tuning(train_task_no_encoded,'classif.ranger',discrete_ps)}
 
     lerner_randomForest <- makeLearner(
       "classif.ranger",
       predict.type = "response",
-      par.vals = list(num.trees= res_rf$x$num.trees, min.node.size = res_rf$x$min.node.size)
+      par.vals = list(num.trees= res_rf$x$num.trees, min.node.size = res_rf$x$min.node.size, mtry=res_rf$x$mtry)
     )
     if (encoding_where_unnessesery){
-      lerner_randomForest <- train(lerner_randomForest,train_task_encoded)}  else { lerner_randomForest <- train(lerner_randomForest,train_task_no_encoded)}
+      lerner_randomForest <- train(lerner_randomForest,train_task_encoded)}  
+    else { 
+      lerner_randomForest <- train(lerner_randomForest,train_task_no_encoded)}
 
     if (encoding_where_unnessesery){
-      rf_results <- predict(lerner_randomForest,test_task_encoded)$data[,3]} else { rf_results <- predict(lerner_randomForest,test_task_no_encoded)$data[,3]}
+      rf_results <- predict(lerner_randomForest,test_task_encoded)$data[,3]} 
+    else { 
+      rf_results <- predict(lerner_randomForest,test_task_no_encoded)$data[,3]}
     
     
     # Logistic Regression
@@ -177,15 +183,15 @@ learining <- function(target, data_encoding, data_no_encoding, train_index, test
   }
 
 #TEST
-task <- OpenML::getOMLDataSet(data.id = 31)
-df <- task$data
-df_2 <- Filter(is.numeric, df)
-df_2$class <- df$class
-
-data <- makeClassifTask(id = "test",
-                  data = df_2,
-                  target = "class")
-tr <- sample(data$nrow, 0.8 * data$nrow)
-tst <- setdiff(seq_len(data$nrow), tr)
-
-r_test <- learining('class', df_2, df_2, train_index = tr, test_index = tst)
+# task <- OpenML::getOMLDataSet(data.id = 31)
+# df <- task$data
+# df_2 <- Filter(is.numeric, df)
+# df_2$class <- df$class
+# 
+# data <- TaskClassif$new(id = "test",
+#                         backend = df_2,
+#                         target = "class")
+# tr <- sample(data$nrow, 0.8 * data$nrow)
+# tst <- setdiff(seq_len(data$nrow), tr)
+# 
+# r_test <- learining('class', df_2, df_2, train_index = tr, test_index = tst)
