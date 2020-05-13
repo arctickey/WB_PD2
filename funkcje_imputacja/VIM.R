@@ -15,7 +15,7 @@ VIM_irmi <-  function (data){
   
   
  
-  dop <- length(colnames(data)) ,
+  dop <- length(colnames(data))
   #Imputacja danych dla zbioru treningowego i testoweg 
   data<- VIM::irmi(data)[1:dop]
 
