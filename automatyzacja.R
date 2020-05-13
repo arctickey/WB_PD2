@@ -92,7 +92,8 @@ for(i in script_paths){
       for(p in 1:length(model_results)){
         models <- c("xgb", "log_reg", "svm", "rf")
         f1 <- F1_Score(y_true = df[test_id, target_column], y_pred = model_results[[p]])
-        scores <- rbind(scores, c(openml_id, type_imputation, models[p], f1, times))
+        acc <- Accuracy(y_true = df[test_id, target_column], y_pred = model_results[[p]])
+        scores <- rbind(scores, c(openml_id, type_imputation, models[p], f1, acc, times))
       } 
       
     
@@ -107,7 +108,7 @@ for(i in script_paths){
     }
 }
 
-colnames(scores) <- c('Dataset','Method','Model', 'F1','Imp_time')
+colnames(scores) <- c('Dataset','Method','Model', 'F1', 'acc', 'Imp_time')
 scores
 #write.csv(scores, './wyniki_csv/wyniki.csv')
 
