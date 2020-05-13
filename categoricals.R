@@ -1,0 +1,44 @@
+
+categorical <- function(data,train_set,test_set,target){
+  
+library(tidyverse)
+library(h2o)
+
+h2o.init()
+#Import the titanic dataset
+rows <- nrow(data)
+cols <- ncol(data)
+categorical_cols <- colnames(data[,colnames(data)[grepl('factor|logical|character',sapply(data,class))],with=F])
+# Split the dataset into train and test
+seed=1234
+# Set target encoding parameters
+blended_avg = TRUE
+inflection_point = 3
+smoothing = 10
+noise = 0.15
+
+X_train <- as.h2o(data[train_set,])
+X_train[,target]<- as.factor(X_train[,target])
+
+X_test <- as.h2o(data[test_set,])
+# Train a TE model
+target_encoder <- h2o.targetencoder(training_frame = X_train, x = categorical_cols,y =target,blending=blended_avg, k=inflection_point, f=smoothing, noise=noise)
+# New target encoded train and test sets
+transformed_train <- h2o.transform(target_encoder, X_train, noise=noise)
+transformed_test <- h2o.transform(target_encoder,X_test,noise=0.0)
+X_train <- as_tibble(transformed_train)
+X_test <- as_tibble(transformed_test)
+
+X_train<- X_train %>% select(-one_of(categorical_cols)) 
+X_test<- X_test %>% select(-one_of(categorical_cols))
+data <- data.frame(matrix(, nrow=rows, ncol=cols))
+data[train_set,] <- X_train
+data[test_set,] <- X_test
+
+colnames(data) <- colnames(X_train)
+return(data)
+}
+
+
+
+
