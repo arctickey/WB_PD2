@@ -8,7 +8,9 @@ h2o.init()
 #Import the titanic dataset
 rows <- nrow(data)
 cols <- ncol(data)
-categorical_cols <- colnames(data[,colnames(data)[grepl('factor|logical|character',sapply(data,class))],with=F])
+categorical_cols <- colnames(data[,colnames(data)[grepl('factor|logical|character',sapply(data,class))]])
+categorical_cols <- categorical_cols[categorical_cols !=target_column]
+
 # Split the dataset into train and test
 seed=1234
 # Set target encoding parameters
@@ -31,14 +33,8 @@ X_test <- as_tibble(transformed_test)
 
 X_train<- X_train %>% select(-one_of(categorical_cols)) 
 X_test<- X_test %>% select(-one_of(categorical_cols))
-data <- data.frame(matrix(, nrow=rows, ncol=cols))
-data[train_set,] <- X_train
-data[test_set,] <- X_test
-
-colnames(data) <- colnames(X_train)
-return(data)
+data <- rbind(X_train,X_test)
+train_set <- 1:nrow(X_train)
+test_set <- nrow(X_train)+1:nrow(X_test)
+return(list(data,train_set,test_set))
 }
-
-
-
-
