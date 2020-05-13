@@ -30,7 +30,7 @@ script_paths <- paste(folder, '/', 'code.R', sep='')
 out <- vector()
 
 
-for(i in script_paths[11]){
+for(i in script_paths){
   
   #Załadowanie zbioru ze skryptu
   source(i, chdir=T)
@@ -79,7 +79,10 @@ for(i in script_paths[11]){
       }
       
       #ENCODING
-      df_encoded <- categorical(df, train_set = train_id, test_set = test_id, target = target_column)
+      encoded <- categorical(df, train_set = train_id, test_set = test_id, target = target_column)
+      df_encoded <- encoded[[1]]
+      train_id <- encoded[[2]]
+      test_id <- encoded[[3]]
       
       #MODELE
       model_results <- learining(target = target_column, data_encoding = df_encoded, data_no_encoding = df,
