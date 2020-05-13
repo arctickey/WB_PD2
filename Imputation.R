@@ -1,12 +1,12 @@
 
 loading <- function(){
   # Funkcja wczytuje niezbędne funkcije z plików 
-source('./funkcje_imputacja/Amelia_Mice_Median.R')
-source('./funkcje_imputacja/missForest.R')
-source('./funkcje_imputacja/missmda.R')
-source('./funkcje_imputacja/VIM.R')
-source('./funkcje_imputacja/softimpute.R')
-source('./funkcje_imputacja/try.R')
+source('./Amelia_Mice_Median.R')
+source('./missForest.R')
+source('./missmda.R')
+source('./VIM.R')
+source('./softimpute.R')
+source('./try.R')
 }
 loading()
 
@@ -22,7 +22,9 @@ all_imputation <- function(data,target){
   # 4 Indeksy zbioru testoweg
   # oczywiście ponieważ R nie lubi krotek to wszystko jeszcze wpycham w liste 
   
-  
+  target_col <- data[,target]
+  data <- data[,ifelse(colnames(data)=='tobacco',FALSE,TRUE)]
+
   train_set = sample(nrow(data), 0.8 * nrow(data))
   test_set = setdiff(seq_len(nrow(data)), train_set)
   
@@ -39,7 +41,7 @@ all_imputation <- function(data,target){
   data_softImpute <- r[order(ord), ]
   time_softImpute <- Sys.time() - time_softImpute
   print('softImpute successful')
-  
+  data_softImpute[,target] <- target_col[order(ord)]
 
   # missForest z tego co patrzyłem ogarniał wszyskie rodzaje zmiennych ale długo działa 
   time_forest <- Sys.time()
@@ -49,7 +51,7 @@ all_imputation <- function(data,target){
   data_missForest[test_set,] <- misinf_forest_aut(data_missForest[test_set,]))
   time_forest <- Sys.time() - time_forest
   
-  
+  data_missForest[,target] <- target_col
   
   # Uzupełnanie medianą/modą 
   time_median <- Sys.time()
@@ -58,7 +60,7 @@ all_imputation <- function(data,target){
   data_median[test_set,] <- prepareMedian(data_median[test_set,])
   time_median <- Sys.time() - time_median
   print('modeMedian successful')
-  
+  data_median[,target] <- target_col
   #Mice
   time_mice <- Sys.time()
   data_mice <- data
@@ -66,28 +68,31 @@ all_imputation <- function(data,target){
   data_mice[test_set,] <- prepareMice(data_mice[test_set,])
   time_mice <- Sys.time() - time_mice
   print('Mice successful')
-   
+  data_mice[,target] <- target_col
+  
+  
   time_irmi <- Sys.time()
   data_irmi <- data
   data_irmi[train_set,] <- VIM_irmi(data_irmi[train_set,])
   data_irmi[test_set,] <- VIM_irmi(data_irmi[test_set,])
   time_irmi <- Sys.time() - time_irmi
   print('VIM_irmi successful')
+  data_irmi[,target] <- target_col
 
 
-  
   #missMDA 
   time_mda <- Sys.time()
   data_missMDA <- data
   data_missMDA[train_set,] <- impute_missMDA(data_missMDA[train_set,])
   data_missMDA[test_set,] <- impute_missMDA(data_missMDA[test_set,])
   time_mda <- Sys.time() - time_mda
-
+  data_missMDA[,target] <- target_col
    
 
   type_of_imputation <- list('median','irmi','mice','forest','MDA','softImpute')
   datasets <- list(data_median,data_irmi,data_mice,data_missForest,data_missMDA,data_softImpute)
   times <- list(time_median,time_irmi,time_mice,time_forest,time_mda,time_softImpute)
+
 
   
   return(list(type_of_imputation,datasets,train_set,test_set,times))
