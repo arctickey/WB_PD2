@@ -112,29 +112,27 @@ learining <- function(target, data_encoding, data_no_encoding, train_index, test
       xgb_result <- predict(xgb_model, test_task_no_encoded)$data[, 3]
     }
     
-    # RADNOM FOREST
-    # discrete_ps = makeParamSet(
-    #   makeDiscreteParam("num.trees", values = c(100, 200, 300,400,500,600)),
-    #   makeDiscreteParam('min.node.size',values = c(1,2,3,4,5)),
-    #
-    #   #makeDiscreteParam('max.depth',values = c(1))
-    #   )
-    #
-    # if (encoding_where_unnessesery){
-    #   res_rf <- cv_tuning(train_task_encoded,'classif.ranger',  discrete_ps )} else { res_rf<- cv_tuning(train_task_no_encoded,'classif.ranger',discrete_ps)}
-    #
-    # lerner_randomForest = mlr_learners$get('classif.ranger')
-    # lerner_randomForest$param_set$values =mlr3misc::insert_named(
-    #   learner$param_set$values,
-    #   list(num.trees= res_rf$x$num.trees, min.node.size = res_rf$x$min.node.size,
-    #        #max.depth=res_rf$x$max.depth,alpha=res_rf$x$alpha
-    #        )
-    # )
-    # if (encoding_where_unnessesery){
-    #   lerner_randomForest$train(task_encoded,row_ids = train_index)}  else { lerner_randomForest$train(task_no_encoded,row_ids = train_index)}
-    #
-    # if (encoding_where_unnessesery){
-    #   rf_results <- lerner_randomForest$predict(task_encoded,row_ids = test_index)} else { rf_results <- lerner_randomForest$predict(task_no_encoded,row_ids = test_index)}
+    #RADNOM FOREST
+    discrete_ps = makeParamSet(
+      makeDiscreteParam("num.trees", values = c(100, 200, 300,400,500,600)),
+      makeDiscreteParam('min.node.size',values = c(1,2,3,4,5))
+
+     # makeDiscreteParam('max.depth',values = c(0.5,1))
+      )
+
+    if (encoding_where_unnessesery){
+      res_rf <- cv_tuning(train_task_encoded,'classif.ranger',  discrete_ps )} else { res_rf<- cv_tuning(train_task_no_encoded,'classif.ranger',discrete_ps)}
+
+    lerner_randomForest <- makeLearner(
+      "classif.ranger",
+      predict.type = "response",
+      par.vals = list(num.trees= res_rf$x$num.trees, min.node.size = res_rf$x$min.node.size)
+    )
+    if (encoding_where_unnessesery){
+      lerner_randomForest <- train(lerner_randomForest,train_task_encoded)}  else { lerner_randomForest <- train(lerner_randomForest,train_task_no_encoded)}
+
+    if (encoding_where_unnessesery){
+      rf_results <- predict(lerner_randomForest,test_task_encoded)$data[,3]} else { rf_results <- predict(lerner_randomForest,test_task_no_encoded)$data[,3]}
     
     
     # Logistic Regression
@@ -157,27 +155,25 @@ learining <- function(target, data_encoding, data_no_encoding, train_index, test
     
     # SVM
     
-    # discrete_ps = makeParamSet(
-    #   makeDiscreteParam('gamma',values = c(0.001,0.01,1)),
-    #   makeDiscreteParam('kernel',values = c('sigmoid')),
-    #   makeDiscreteParam('cost',values = c(0.5,1))
-    #   )
-    #
-    # res_SVM <- cv_tuning(train_task_encoded,'classif.svm',discrete_ps)
-    #
-    # lerner_SVM = mlr_learners$get('classif.svm')
-    # lerner_SVM$param_set$values = mlr3misc::insert_named(
-    #   lerner_SVM$param_set$values,
-    #   list(gamma= res_SVM$x$gamma, kernel = res_SVM$x$kernel,
-    #        cost=res_SVM$x$cost
-    #        )
-    # )
-    #
-    # lerner_SVM$train(task_encoded,row_ids = train_index_index)
-    # SVM_result <- lerner_SVM$predict(task_encoded,row_ids = test_index)
+    discrete_ps = makeParamSet(
+      makeDiscreteParam('gamma',values = c(0.001,0.01,1)),
+      makeDiscreteParam('kernel',values = c('sigmoid'))
+      )
+
+    res_SVM <- cv_tuning(train_task_encoded,'classif.svm',discrete_ps)
+
+  
+    lerner_SVM <- makeLearner(
+      "classif.svm",
+      predict.type = "response",
+      par.vals = list(gamma= res_SVM$x$gamma, kernel = res_SVM$x$kernel)
+    )
+
+    lerner_SVM <- train(lerner_SVM,train_task_encoded)
+    SVM_result <- predict(lerner_SVM,test_task_encoded)$data[,3]
     
     
-    return(list(xgb_result, lg_result))
+    return(list(xgb_result, lg_result,SVM_result,rf_results))
   }
 
 #TEST
@@ -186,8 +182,8 @@ df <- task$data
 df_2 <- Filter(is.numeric, df)
 df_2$class <- df$class
 
-data <- TaskClassif$new(id = "test",
-                  backend = df_2,
+data <- makeClassifTask(id = "test",
+                  data = df_2,
                   target = "class")
 tr <- sample(data$nrow, 0.8 * data$nrow)
 tst <- setdiff(seq_len(data$nrow), tr)
