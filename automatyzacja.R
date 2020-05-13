@@ -19,8 +19,8 @@ source("./categoricals.R")
 
 
 #Tabela na wyniki
-scores = tibble(Dataset = numeric(),Method = character(),Acc = numeric(),Auc=numeric(),
-                recall = numeric(),precision=numeric())
+scores = tibble(Dataset = numeric(),Method = character(),Model = character(),F1 = numeric(),acc=numeric(),Imp_time = numeric())
+colnames(scores) <- c('Dataset','Method','Model', 'F1', 'acc', 'Imp_time')
 
 
 #AUTOMATYZACJA
@@ -94,6 +94,7 @@ for(i in script_paths){
         f1 <- F1_Score(y_true = df[test_id, target_column], y_pred = model_results[[p]])
         acc <- Accuracy(y_true = df[test_id, target_column], y_pred = model_results[[p]])
         scores <- rbind(scores, c(openml_id, type_imputation, models[p], f1, acc, times))
+        write.csv(scores, './wyniki_csv/result.csv')
       } 
       
     
@@ -107,8 +108,5 @@ for(i in script_paths){
     
     }
 }
-
 colnames(scores) <- c('Dataset','Method','Model', 'F1', 'acc', 'Imp_time')
-scores
-#write.csv(scores, './wyniki_csv/wyniki.csv')
-
+write.csv(scores, './wyniki_csv/result.csv')
