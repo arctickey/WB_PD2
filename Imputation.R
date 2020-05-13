@@ -1,12 +1,12 @@
 
 loading <- function(){
   # Funkcja wczytuje niezbędne funkcije z plików 
-source('./Amelia_Mice_Median.R')
-source('./missForest.R')
-source('./missmda.R')
-source('./VIM.R')
-source('./softimpute.R')
-source('./try.R')
+source('./funkcje_imputacja/Amelia_Mice_Median.R')
+source('./funkcje_imputacja/missForest.R')
+source('./funkcje_imputacja/missmda.R')
+source('./funkcje_imputacja/VIM.R')
+source('./funkcje_imputacja/softimpute.R')
+source('./funkcje_imputacja/try.R')
 }
 loading()
 
@@ -88,7 +88,6 @@ all_imputation <- function(data,target){
   type_of_imputation <- list('median','irmi','mice','forest','MDA','softImpute')
   datasets <- list(data_median,data_irmi,data_mice,data_missForest,data_missMDA,data_softImpute)
   times <- list(time_median,time_irmi,time_mice,time_forest,time_mda,time_softImpute)
-
 
   
   return(list(type_of_imputation,datasets,train_set,test_set,times))
