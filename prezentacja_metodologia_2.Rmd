@@ -22,7 +22,7 @@ folder <- folder[-1]
 script_paths <- paste(folder, '/', 'code.R', sep='')
 
 zbiory_danych <- as.data.frame(matrix(nrow = 14,ncol = 5))
-colnames(zbiory_danych) <- c('Ilość Obserwacji','Ilość Kolumn','Procent braków danych','Balans Klas','Openml_ID')
+colnames(zbiory_danych) <- c('Liczba Obserwacji','Liczba Kolumn','Procent braków danych','Balans Klas','Openml_ID')
 iterator <- 1 
 for(i in script_paths){
   source(i, chdir=T)
@@ -31,7 +31,7 @@ for(i in script_paths){
   more_frequent  <- table(dataset[,target_column])[1]
   less_frequent <- table(dataset[,target_column])[2]
   suma <- more_frequent+less_frequent
-  balans <- paste0(round(more_frequent/suma*100,2),'%/',round(less_frequent/suma*100,2),'%')
+  balans <- paste0(round(more_frequent/suma*100,0),'%/',round(less_frequent/suma*100,0),'%')
   zbiory_danych[iterator,4] <- balans
   number_of_missing <- sum(sapply(dataset, function(x) sum(is.na(x))))
   
