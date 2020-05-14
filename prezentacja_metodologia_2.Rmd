@@ -14,8 +14,8 @@ knitr::opts_chunk$set(echo = FALSE)
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE,cache=TRUE}
 #path_to_datasets <- "/home/jan/Pulpit/WB/2020L-WarsztatyBadawcze-Imputacja/datasets/"
-path_to_datasets <- "/home/piotr/Programowanie/WB/fork_grupy/2020L-WarsztatyBadawcze-Imputacja/datasets"
-#path_to_datasets <- "/home/arctickey/2020L-WarsztatyBadawcze-Imputacja/datasets"
+#path_to_datasets <- "/home/piotr/Programowanie/WB/fork_grupy/2020L-WarsztatyBadawcze-Imputacja/datasets"
+path_to_datasets <- "/home/arctickey/2020L-WarsztatyBadawcze-Imputacja/datasets"
 
 folder <- list.dirs(path_to_datasets)
 folder <- folder[-1]
@@ -243,7 +243,7 @@ order_scores1 <- order_scores1[order(order_scores1$wynik),]
 knitr::kable(order_scores1)
 ```
 
-Na podstawie tych wyników można wyciągnąc już dużo głębsze wnioski, dzięki możliwości rzetelnego porównania sprawowania się algorytmów imptuacji.
+Na podstawie tych wyników można wyciągnąc już dużo głębsze wnioski, dzięki możliwości rzetelnego porównania między sobą wyników uzyskanych przez algorytmy, na konkretnych zbiorach.
 
 ## Rankig imputacja + algorytm
 
@@ -255,7 +255,7 @@ data4 <- data %>% group_by(dataset,method,algorithm) %>% summarise(mean=mean(acc
 order_scores2 <- data4 %>% group_by(dataset) %>% mutate(good_ranks = rank(-mean, ties.method = "max"))
 order_scores3 <- order_scores2 %>% group_by(method,algorithm) %>% summarise(wynik = sum(good_ranks))
 order_scores3 <- order_scores3[order(order_scores3$wynik),]
-knitr::kable(order_scores3)
+knitr::kable(order_scores3[c(1:6),])
 
 ```
 
