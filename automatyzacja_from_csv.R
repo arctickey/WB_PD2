@@ -33,7 +33,7 @@ folders <- c("median/", "softimpute/", "missmda/", "missForest/", "mice/")
 csv_df <- paste(path, folders, sep="")
 
 
-for(i in script_paths[10:length(script_paths)]){
+for(i in script_paths[1:length(script_paths)]){
   
   #Załadowanie zbioru ze skryptu
   source(i, chdir=T)
@@ -79,7 +79,7 @@ for(i in script_paths[10:length(script_paths)]){
           acc <- Accuracy(y_true = df[test_id, target_column], y_pred = model_results[[p]])
           score <- t(c(openml_id, type_imputation, models[p], f1, acc))
           scores <- rbind(scores, score)
-          write.table(score, file = "./wyniki_csv/testujemy.csv", sep = ",", append = TRUE, quote = FALSE,
+          write.table(score, file = "./wyniki_csv/wyniki.csv", sep = ",", append = TRUE, quote = FALSE,
                       col.names = FALSE, row.names = FALSE)
       }
     }
