@@ -16,7 +16,7 @@ folder <- list.dirs(path_to_fork_datasets)[-1]
 script_paths <- paste(folder, '/', 'code.R', sep='')
 
 #SKRYPTY
-source("./CopyOfalgorytmy.R")
+source("./algorytmy.R")
 loading_algoritms()
 source("./categoricals.R")
 
@@ -33,14 +33,14 @@ folders <- c("median/", "softimpute/", "missmda/", "missForest/", "mice/")
 csv_df <- paste(path, folders, sep="")
 
 
-for(i in script_paths[1:length(script_paths)]){
+for(i in script_paths[10:length(script_paths)]){
   
   #Załadowanie zbioru ze skryptu
   source(i, chdir=T)
   
-  if(openml_id==41278){
-    next
-  }
+  # if(openml_id==41278){
+  #   next
+  # }
   
   for(j in 1:length(csv_df)){
     
@@ -79,7 +79,7 @@ for(i in script_paths[1:length(script_paths)]){
           acc <- Accuracy(y_true = df[test_id, target_column], y_pred = model_results[[p]])
           score <- t(c(openml_id, type_imputation, models[p], f1, acc))
           scores <- rbind(scores, score)
-          write.table(score, file = "./wyniki_csv/RESULT.csv", sep = ",", append = TRUE, quote = FALSE,
+          write.table(score, file = "./wyniki_csv/testujemy.csv", sep = ",", append = TRUE, quote = FALSE,
                       col.names = FALSE, row.names = FALSE)
       }
     }

@@ -71,10 +71,10 @@ learining <- function(target, data_encoding, data_no_encoding, train_index, test
     )
     # parametry dla xgb
     discrete_ps = makeParamSet(
-      makeDiscreteParam("eta", values = c(0.2, 0.1,0.6,0.4,1)),
-      makeDiscreteParam("gamma", values = c(0.1, 0.2, 0.3,0.5,0.9)),
-      makeDiscreteParam('max_depth', values = c(5, 6, 7,10,12)),
-      makeDiscreteParam('subsample', values = c(0.2, 0.4, 0.6,0.8,0.1))
+      makeDiscreteParam("eta", values = c(0.01, 0.1, 0.2, 0.3, 0.5)),
+      makeDiscreteParam("gamma", values = c(0.1, 0.5, 1, 5)),
+      makeDiscreteParam('max_depth', values = c(5, 6, 7, 10, 12)),
+      makeDiscreteParam('subsample', values = c(0.4, 0.6, 0.8, 0.1))
       )
     
     if (encoding_where_unnessesery) {
@@ -110,9 +110,9 @@ learining <- function(target, data_encoding, data_no_encoding, train_index, test
     
     #RADNOM FOREST
     discrete_ps = makeParamSet(
-      makeDiscreteParam("num.trees", values = c(100,500,600,200,300,400)),
-      makeDiscreteParam('min.node.size',values = c(1,2,3,4,5,7,8,9)),
-      makeDiscreteParam('mtry', sample(seq(2, ncol(data_encoding)-1), 4))
+      makeDiscreteParam("num.trees", values = c(50, 100, 200, 300, 400, 500)),
+      makeDiscreteParam('min.node.size',values = c(1,2,3,4,5))
+      #makeDiscreteParam('mtry', sample(seq(2, ncol(data_encoding)-1), 4))
       #makeDiscreteParam('max.depth',values = c(0.5,1))
       )
 
@@ -124,7 +124,7 @@ learining <- function(target, data_encoding, data_no_encoding, train_index, test
     lerner_randomForest <- makeLearner(
       "classif.ranger",
       predict.type = "response",
-      par.vals = list(num.trees= res_rf$x$num.trees, min.node.size = res_rf$x$min.node.size, mtry=res_rf$x$mtry)
+      par.vals = list(num.trees= res_rf$x$num.trees, min.node.size = res_rf$x$min.node.size)
     )
     if (encoding_where_unnessesery){
       lerner_randomForest <- train(lerner_randomForest,train_task_encoded)}  
@@ -159,7 +159,7 @@ learining <- function(target, data_encoding, data_no_encoding, train_index, test
     
     discrete_ps = makeParamSet(
       makeDiscreteParam('gamma',values = c(0.001,0.01,0.1,0.3,0.6,0.8,1)),
-      makeDiscreteParam('kernel',values = c('radial basis'))
+      makeDiscreteParam('kernel',values = c('radial'))
       )
 
     res_SVM <- cv_tuning(train_task_encoded,'classif.svm',discrete_ps)
