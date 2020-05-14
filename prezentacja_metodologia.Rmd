@@ -115,6 +115,7 @@ Wykorzystane modele (*mlr name*):
 ![](schemat.png)
 </center>
 
+
 ## Wyniki
 Zdecydowaliśmy się na użycie dwóch miar skuteczności algorytmów: F1 score oraz Accuracy. Te dwie miary dobrze się uzupełniają, gdyż pozwalają dobrze zmierzyć skuteczności naszych imputacji oraz algorytmów zarówno na zbiorach zbalansowanych, jak i niezbalansowanych.
 
@@ -185,3 +186,5 @@ order_scores <- data3 %>% group_by(dataset) %>% mutate(good_ranks = order(order(
 order_scores1 <- order_scores %>% group_by(method) %>% summarise(wynik = sum(good_ranks))
 order_scores1
 ```
+
+
