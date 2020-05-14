@@ -16,7 +16,7 @@ folder <- list.dirs(path_to_fork_datasets)[-1]
 script_paths <- paste(folder, '/', 'code.R', sep='')
 
 #SKRYPTY
-source("./algorytmy.R")
+source("./CopyOfalgorytmy.R")
 loading_algoritms()
 source("./categoricals.R")
 
@@ -38,6 +38,10 @@ for(i in script_paths[1:length(script_paths)]){
   #Załadowanie zbioru ze skryptu
   source(i, chdir=T)
   
+  if(openml_id==41278){
+    next
+  }
+  
   for(j in 1:length(csv_df)){
     
     csv_train <- paste(csv_df[j], openml_id, "_train.csv", sep = "")
@@ -45,6 +49,8 @@ for(i in script_paths[1:length(script_paths)]){
     
     type_imputation <- folders[j]
     type_imputation <- sub(".$", "", type_imputation)
+    
+    try({#poczatek try
     
     if(file.exists(csv_train) && file.exists(csv_test)){
       
@@ -77,6 +83,7 @@ for(i in script_paths[1:length(script_paths)]){
                       col.names = FALSE, row.names = FALSE)
       }
     }
+    })#koniec try
   }
 }
   
