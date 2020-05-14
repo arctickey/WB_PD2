@@ -1,0 +1,58 @@
+---
+title: "Prezentacja metodologii"
+author: "Jan Borowski, Filip Chrzuszcz, Piotr Fic"
+date: "14 05 2020"
+output: ioslides_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Kodowanie zmiennych kategorycznych
+
+Uzupełnione zbiory danych zawierają wiele zmiennych kategorycznych. Podejścia odrzucone:
+
+- one-hot encoding
+- ordinal encoding
+
+Wybrane rozwiązanie:
+
+- target encoding
+
+Metoda kodowania jest uniwersalna i powszechnie używana.  
+Dodatkowo usunięto w kilku zbiorach zmienne, które zawierały
+bardzo dużo unikalnych wartości.
+
+## Schemat kodowania zmiennych kategorycznych
+
+- Zbiór podzielony na część treningową i testową
+- Wyliczenie parametrów **target encoding** na zbiorze treningowym
+- Kodowanie zmiennych w obu zbiorach
+
+## Narzędzie do kodowania
+
+Pakiet [H<sub>2</sub>O](https://docs.h2o.ai/h2o/latest-stable/h2o-docs/index.html) napisany w języku Java, udostępniający API
+dla R i python. Wykorzystuje obliczenia wielowątkowe. Kompletne narzędzie do
+uczenia maszynowego.  
+Użyty moduł do target encoding:  
+
+- dodanie szumu 
+- średnie ważone względem liczności grup
+
+## Wybrane algorytmy
+
+Zbiory danych są gotowe do użycia przez modele uczenia maszynowego.  
+Wykorzystane modele (*mlr name*):
+
+- **regresja logistyczna**: *classif.glmnet*
+- **las losowy**: *classif.ranger*
+- **SVM**: *classif.svm*
+- **XGBoost**: *classif.xgboost*
+
+## Ewaluacja modeli
+
+<center>
+![](schemat.png)
+</center>
+
