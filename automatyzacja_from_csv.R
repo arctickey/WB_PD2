@@ -38,9 +38,9 @@ for(i in script_paths[1:length(script_paths)]){
   #Załadowanie zbioru ze skryptu
   source(i, chdir=T)
   
-  # if(openml_id==41278){
-  #   next
-  # }
+  if(openml_id==41278){
+    next
+  }
   
   for(j in 1:length(csv_df)){
     
