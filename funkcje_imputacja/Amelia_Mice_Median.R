@@ -23,7 +23,7 @@ prepareAmelia <- function(data,noms=NULL,ords=NULL,idvars=NULL){
 prepareMice <- function(data){
   #W sumie nic skomlikowanego tutaj nie ma
   library(mice)
-  imp <- mice(data,m=1,maxit=1,meth='sample',seed=500)
+  imp <- mice(data,m=10,maxit=10,meth='sample',seed=500)
   tempData <- complete(imp)
   return(tempData)
 }
