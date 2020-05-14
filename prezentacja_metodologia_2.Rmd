@@ -3,6 +3,7 @@ title: "Prezentacja metodologii"
 author: "Jan Borowski, Filip Chrzuszcz, Piotr Fic"
 date: "14 05 2020"
 output: ioslides_presentation
+widescreen: true
 ---
 
 ```{r setup, include=FALSE}
@@ -12,8 +13,8 @@ knitr::opts_chunk$set(echo = FALSE)
 ## Wykorzystane zbiory danych  
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE,cache=TRUE}
-path_to_datasets <- "/home/jan/Pulpit/WB/2020L-WarsztatyBadawcze-Imputacja/datasets/"
-#path_to_datasets <- "/home/piotr/Programowanie/WB/fork_grupy/2020L-WarsztatyBadawcze-Imputacja/datasets"
+#path_to_datasets <- "/home/jan/Pulpit/WB/2020L-WarsztatyBadawcze-Imputacja/datasets/"
+path_to_datasets <- "/home/piotr/Programowanie/WB/fork_grupy/2020L-WarsztatyBadawcze-Imputacja/datasets"
 #path_to_datasets <- "/home/arctickey/2020L-WarsztatyBadawcze-Imputacja/datasets"
 
 folder <- list.dirs(path_to_datasets)
@@ -34,7 +35,7 @@ for(i in script_paths){
   zbiory_danych[iterator,4] <- balans
   number_of_missing <- sum(sapply(dataset, function(x) sum(is.na(x))))
   
-  zbiory_danych[iterator,3] <- paste0(round(number_of_missing/(length(dataset[,1])*(length(colnames(dataset))-1)),2),'%')
+  zbiory_danych[iterator,3] <- paste0(round(100*number_of_missing/(length(dataset[,1])*(length(colnames(dataset))-1)),2),'%')
   zbiory_danych[iterator,5] <- openml_id
   iterator <- iterator+1
 }
@@ -42,26 +43,26 @@ for(i in script_paths){
 knitr::kable(zbiory_danych, format = "html", table.attr = "style='height:40%;'")
 ```
 ## Podział zbirou na testowy i treningowy 
-Karzdy zbiór był wstępnie czyszczony a następnie dzielony w sposób losowy na podzbiór treningowy i testowy : 
+Każdy zbiór był wstępnie czyszczony a następnie dzielony w sposób losowy na podzbiór treningowy i testowy: 
 
-- Zbiór terningowy **80%**obserwacji 
-- Zbiór testwoy **20%** obserwacji
+- Zbiór treningowy **80%** obserwacji 
+- Zbiór testowy **20%** obserwacji
 
-Podział pozostawał taki sam dla wszystkich metod imputacij i użytych modeli.
+Podział pozostawał taki sam dla wszystkich metod imputacji i użytych modeli.
 
-## Wykorzystane techniki imputacij braków danych 
-Przed przystąpieniem do imputacij usuneliśmy zmienną celu:
+## Wykorzystane techniki imputacji braków danych 
+Przed przystąpieniem do imputacji usunęliśmy zmienną celu:
 
-- Imputacja z pomocą **mediany** (14/14)
-- Imputacja metodą z pakietu **mice**(13/14)
+- Imputacja za pomocą **mediany** (14/14)
+- Imputacja metodą z pakietu **mice** (13/14)
 - Imputacja **missForest** (?/14)
 - Imputacja **missMDA** (11/14)
 - Imputacja **softImpute + mediana** (12/14)
 - Imputacja funkcją **irmi** z pakietu **VIM** (?????) Jescze nie przeprowadzona 
 
-Po imputacij do zbioru ponownie dołączono kolumnę celu.
+Po imputacji do zbioru ponownie dołączono kolumnę celu.
 
-## Przebieg imputacij 
+## Przebieg imputacji
 
 <center>
 ![](diagram_imput.png)
@@ -69,30 +70,30 @@ Po imputacij do zbioru ponownie dołączono kolumnę celu.
 
 ## Kodowanie zmiennych kategorycznych
 
-Uzupełnione zbiory danych zawierają wiele zmiennych kategorycznych. Podejścia odrzucone:
+Uzupełnione zbiory danych zawierają wiele zmiennych kategorycznych.  
+Podejścia odrzucone:
 
 - one-hot encoding
 - ordinal encoding
 
 Wybrane rozwiązanie:
 
-- target encoding
+- **target encoding**
 
 Metoda kodowania jest uniwersalna i powszechnie używana.  
 Dodatkowo usunięto w kilku zbiorach zmienne, które zawierały
 bardzo dużo unikalnych wartości.
 
-## Schemat kodowania zmiennych kategorycznych
+## Kodowanie zmiennych kategorycznych
 
-- Zbiór podzielony na część treningową i testową
-- Wyliczenie parametrów **target encoding** na zbiorze treningowym
-- Kodowanie zmiennych w obu zbiorach
+1. Zbiór podzielony na część treningową i testową
+2. Wyliczenie parametrów **target encoding** na zbiorze treningowym
+3. Kodowanie zmiennych w obu zbiorach
 
 ## Narzędzie do kodowania
 
-Pakiet [H<sub>2</sub>O](https://docs.h2o.ai/h2o/latest-stable/h2o-docs/index.html) napisany w języku Java, udostępniający API
-dla R i python. Wykorzystuje obliczenia wielowątkowe. Kompletne narzędzie do
-uczenia maszynowego.  
+Pakiet [H<sub>2</sub>O](https://docs.h2o.ai/h2o/latest-stable/h2o-docs/index.html) napisany w języku Java, udostępniający API dla R i python. Wykorzystuje obliczenia wielowątkowe.  
+Kompletne narzędzie do uczenia maszynowego.  
 Użyty moduł do target encoding:  
 
 - dodanie szumu 
@@ -114,4 +115,30 @@ Wykorzystane modele (*mlr name*):
 <center>
 ![](schemat.png)
 </center>
+
+## Ewaluacja modeli
+
+1. Podział zbiorów na część treningową i testową  
+jednakowy dla wszystkich modeli i metod imputacji
+2. Podczas kroswalidacji strojenie parametrów modeli:
+
+- **regresja logistyczna**: *alpha, nlambda*
+- **las losowy**: *num.trees, min.node.size, mtry*
+- **SVM**: *gamma*
+- **XGBoost**: *eta, gamma, max_depth, subsample*
+
+## Metryki ewaluacji
+
+Jako podstawowy odnośnik  
+ 
+$Accuracy = \frac{TP+TN}{TP+FP+FN+TN}$
+
+Uwzględniając niezbalansowanie części zbiorów
+
+$F1 = \frac{2\cdot precision \cdot recall}{precision+recall}$
+
+Gdzie:
+
+- precision $\frac{TP}{TP+FP}$
+- recall $\frac{TP}{TP+FN}$
 
