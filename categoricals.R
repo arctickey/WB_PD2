@@ -8,9 +8,12 @@ h2o.init()
 #Import the titanic dataset
 rows <- nrow(data)
 cols <- ncol(data)
+data[,target]<- as.factor(data[,target])
 categorical_cols <- colnames(data[,colnames(data)[grepl('factor|logical|character',sapply(data,class))]])
 categorical_cols <- categorical_cols[categorical_cols !=target_column]
-
+if(length(categorical_cols)==0){
+  return(list(data,train_set,test_set))
+}
 # Split the dataset into train and test
 seed=1234
 # Set target encoding parameters
@@ -20,7 +23,7 @@ smoothing = 10
 noise = 0.15
 
 X_train <- as.h2o(data[train_set,])
-X_train[,target]<- as.factor(X_train[,target])
+
 
 X_test <- as.h2o(data[test_set,])
 # Train a TE model
