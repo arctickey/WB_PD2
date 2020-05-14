@@ -5,6 +5,8 @@ library(mlr3)
 library(tidyverse)
 library(R.utils) 
 library(MLmetrics)
+library(OpenML)
+library(mlr)
 
 #SCIEZKI DO DATASETOW FORK GRUPY !!!
 path_to_fork_datasets <- "/home/piotr/Programowanie/WB/fork_grupy/2020L-WarsztatyBadawcze-Imputacja/datasets"   #<<<<<<<=======
@@ -26,12 +28,12 @@ colnames(scores) <- c('Dataset','Method','Model', 'F1', 'acc')
 
 #AUTOMATYZACJA
 path <- "/home/piotr/Programowanie/WB/WB_PD2/imputed_data/"   #<<<<<=========
-folders <- c("median/", "softimpute/", "missmda/")
+folders <- c("median/", "softimpute/", "missmda/", "missForest/", "mice/")
 #folders <- c("median/")
 csv_df <- paste(path, folders, sep="")
 
 
-for(i in script_paths){
+for(i in script_paths[1:length(script_paths)]){
   
   #Załadowanie zbioru ze skryptu
   source(i, chdir=T)
@@ -51,6 +53,7 @@ for(i in script_paths){
       
       
       df <- rbind(df_train, df_test)
+      df[sapply(df, is.character)] <- lapply(df[sapply(df, is.character)], as.factor)
       train_id <- 1:nrow(df_train)
       test_id <- (nrow(df_train)+1):nrow(df)
       
@@ -68,9 +71,9 @@ for(i in script_paths){
           models <- c("xgb", "log_reg", "svm", "rf")
           f1 <- F1_Score(y_true = df[test_id, target_column], y_pred = model_results[[p]])
           acc <- Accuracy(y_true = df[test_id, target_column], y_pred = model_results[[p]])
-          score <- c(openml_id, type_imputation, models[p], f1, acc)
+          score <- t(c(openml_id, type_imputation, models[p], f1, acc))
           scores <- rbind(scores, score)
-          write.table(score, file = "./wyniki/RESULT.csv", sep = ",", append = TRUE, quote = FALSE,
+          write.table(score, file = "./wyniki_csv/RESULT.csv", sep = ",", append = TRUE, quote = FALSE,
                       col.names = FALSE, row.names = FALSE)
       }
     }
