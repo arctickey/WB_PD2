@@ -9,6 +9,8 @@ impute_softimpute <- function(df, mode_vars = FALSE, leave_missing = NULL){
   #mode_vars{colnames-string}: variables where impute mode, default: all factors
   #leave_missing{colnames-string}: variables where NA becomes new category (convert to factor)
   
+  df <- data_softImpute[train_set,]
+  
   factors <- sapply(df, is.factor)
   
   if(any(factors)){
@@ -48,9 +50,14 @@ impute_softimpute <- function(df, mode_vars = FALSE, leave_missing = NULL){
     }
     
     #for categorical where mode
-    for (var in mode_vars_col){
-      df_factors[is.na(df_factors[, var]), var] <- Mode(df_factors[, var])
+    if(sum(factors)>1){
+      for (var in mode_vars_col){
+        df_factors[is.na(df_factors[, var]), var] <- Mode(df_factors[, var])
+      }  
+    }else{
+      df_factors[is.na(df_factors)] <- Mode(df_factors)
     }
+    
     
     #for categorical where impute category => NA as factor
     for (var in leave_missing){
