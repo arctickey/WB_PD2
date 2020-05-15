@@ -57,7 +57,7 @@ Przed przystąpieniem do imputacij usuneliśmy zmienną celu:
 - Imputacja **missForest** (14/14)
 - Imputacja **missMDA** (11/14)
 - Imputacja **softImpute + mediana** (12/14)
-- Imputacja funkcją **irmi** z pakietu **VIM** (?????) Jescze nie przeprowadzona 
+- Imputacja funkcją **irmi** z pakietu **VIM** (11/14) 
 
 Po imputacij do zbioru ponownie dołączono kolumnę celu.
 
