@@ -14,8 +14,8 @@ knitr::opts_chunk$set(echo = FALSE)
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE,cache=TRUE}
 #path_to_datasets <- "/home/jan/Pulpit/WB/2020L-WarsztatyBadawcze-Imputacja/datasets/"
-#path_to_datasets <- "/home/piotr/Programowanie/WB/fork_grupy/2020L-WarsztatyBadawcze-Imputacja/datasets"
-path_to_datasets <- "/home/arctickey/2020L-WarsztatyBadawcze-Imputacja/datasets"
+path_to_datasets <- "/home/piotr/Programowanie/WB/fork_grupy/2020L-WarsztatyBadawcze-Imputacja/datasets"
+#path_to_datasets <- "/home/arctickey/2020L-WarsztatyBadawcze-Imputacja/datasets"
 
 folder <- list.dirs(path_to_datasets)
 folder <- folder[-1]
@@ -123,7 +123,7 @@ jednakowy dla wszystkich modeli i metod imputacji
 2. Podczas kroswalidacji strojenie parametrów modeli:
 
 - **regresja logistyczna**: *alpha, nlambda*
-- **las losowy**: *num.trees, min.node.size, mtry*
+- **las losowy**: *num.trees, min.node.size*
 - **SVM**: *gamma*
 - **XGBoost**: *eta, gamma, max_depth, subsample*
 
