@@ -37,8 +37,8 @@ for(i in script_paths){
   target_col <- data[,target]
   data <- data[,ifelse(colnames(data)==target,FALSE,TRUE)]
   
-  train_set = sample(nrow(data), 0.8 * nrow(data))
-  test_set = setdiff(seq_len(nrow(data)), train_set)
+  train_set = read.csv(file = paste("./indeksy/train", openml_id, ".csv", sep = ""))$x
+  test_set = read.csv(file = paste("./indeksy/test", openml_id, ".csv", sep = ""))$x
   
   #IMPUTACJA
   time_median <- Sys.time()
@@ -48,12 +48,16 @@ for(i in script_paths){
   time_median <- Sys.time() - time_median
   print('modeMedian successful')
   data_median[,target] <- target_col
-  
+
   czasy <- rbind(czasy, c(openml_id, time_median))
+
+  if(sum(is.na(data_median))>0 || is.null(data_median)){
+    next
+  }
   
   write.csv(data_median[train_set, ], file = paste("./imputed_data/median/", openml_id, "_train.csv", sep=""))
   write.csv(data_median[test_set, ], file = paste("./imputed_data/median/", openml_id, "_test.csv", sep=""))
-  
+
 }
 
 write.csv(czasy, file = paste("./imputed_data/czasy/median.csv"))
