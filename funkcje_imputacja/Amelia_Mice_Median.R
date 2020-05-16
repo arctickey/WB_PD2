@@ -32,7 +32,7 @@ Mode <- function (x, na.rm) {
   #Funckja pomocnicza licząca modę dla każdej kolumny
   xtab <- table(x)
   xmode <- names(which(xtab == max(xtab)))
-  if (length(xmode) > 1) xmode <- ">1 mode"
+  if (length(xmode) > 1) xmode <- xmode[1]
   return(xmode)
 }
 
