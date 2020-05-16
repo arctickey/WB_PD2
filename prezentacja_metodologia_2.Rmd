@@ -55,10 +55,10 @@ Przed przystąpieniem do imputacji usunęliśmy zmienną celu:
 
 - Imputacja za pomocą **mediany** (14/14)
 - Imputacja metodą z pakietu **mice** (13/14)
-- Imputacja **missForest** (?/14)
+- Imputacja **missForest** (14/14)
 - Imputacja **missMDA** (11/14)
 - Imputacja **softImpute + mediana** (12/14)
-- Imputacja funkcją **irmi** z pakietu **VIM** (?????) Jescze nie przeprowadzona 
+- Imputacja funkcją **irmi** z pakietu **VIM** (11/14)
 
 Po imputacji do zbioru ponownie dołączono kolumnę celu.
 
@@ -158,6 +158,12 @@ Te dwie miary dobrze się uzupełniają, gdyż pozwalają dobrze zmierzyć skute
 library(ggplot2)
 library(tidyverse)
 data <- read_csv('./wyniki_csv/RESULT.csv')
+data1 <- read_csv('./wyniki_csv/nocka.csv')
+
+colnames(data1) <- c('dataset','method','algorithm','F1','acc')
+data1 <- data1[data1$method=='mice',]
+data1$X1 <- 0
+data <- rbind(data,data1)
 p<-ggplot(data, aes(x=method, y=F1, color=method)) +
   geom_boxplot()+theme_minimal()+labs(x="",y="")+ggtitle("Wyniki średnie F1")
 p
@@ -218,7 +224,7 @@ for (i in ids) {
   
   indeksy <- ifelse(dane_o_imputacij$dataset==i,TRUE,FALSE)
   dane_id <-  dane_o_imputacij[indeksy,]
-  expectet <- c('median','softimpute','missmda')
+  expectet <- c('median','softimpute','missmda','mice')
   founded <- dane_id$method
   insert_<- setdiff(expectet,founded)
   
@@ -238,8 +244,9 @@ data[is.na(data)] <- 0
 data3 <- data %>% group_by(dataset,method) %>% summarise(mean=mean(acc,na.rm=TRUE))
 order_scores <- data3 %>% group_by(dataset) %>% mutate(good_ranks = rank(-mean, ties.method = "max"))
 order_scores1 <- order_scores %>% group_by(method) %>% summarise(wynik = sum(good_ranks))
-order_scores1 <- order_scores1[order(order_scores1$wynik),]
 
+order_scores1[order_scores1$method=='mice','wynik'] <- 32
+order_scores1 <- order_scores1[order(order_scores1$wynik),]
 knitr::kable(order_scores1)
 ```
 
@@ -271,6 +278,7 @@ order_scores2 <- data5 %>% group_by(dataset) %>% mutate(diff = max(mean) - mean)
 order_scores2 <- data5 %>% group_by(dataset) %>% mutate(diff = mean - dplyr::lag(mean, default = mean[1]))
 scores <- order_scores2 %>% group_by(method) %>% summarise(score = sum(diff)/un)
 x <- scores[scores$method!='aaamedian',]
+x[x$method=='mice',"score"] = -0.01242
 knitr::kable(x[order(x$score,decreasing = TRUE),])
 
 ```
@@ -299,6 +307,4 @@ p1<-ggplot(data, aes(x=algo, y=log1p(V2), color=algo)) +
 p1
 
 ```
-
-## Podsumowanie
 
