@@ -9,7 +9,7 @@ impute_softimpute <- function(df, mode_vars = FALSE, leave_missing = NULL){
   #mode_vars{colnames-string}: variables where impute mode, default: all factors
   #leave_missing{colnames-string}: variables where NA becomes new category (convert to factor)
   
-  df <- data_softImpute[train_set,]
+  #df <- data_softImpute[train_set,]
   
   factors <- sapply(df, is.factor)
   
