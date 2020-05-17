@@ -14,7 +14,7 @@ impute_missMDA <- function(df){
   num_of_components = tryCatch({
     withTimeout(
       estim_ncpFAMD(df, ncp.max = 3, method.cv = "Kfold", nbsim = 5)$ncp,
-      timeout = 600, # <<<< CZAS
+      timeout = 1000, # <<<< CZAS
       onTimeout = "error"
     )
   }, warning = function(c){
@@ -31,7 +31,7 @@ impute_missMDA <- function(df){
     df <- imputeFAMD(df, ncp = num_of_components)$completeObs
     message('missMDA successful')
     return(df)},
-    timeout = 120, # <<<< CZAS
+    timeout = 300, # <<<< CZAS
     onTimeout = "error"
     )
   }, warning = function(c){
