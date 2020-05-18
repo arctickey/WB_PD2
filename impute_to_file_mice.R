@@ -39,8 +39,9 @@ for(i in script_paths){
   target_col <- data[,target]
   data <- data[,ifelse(colnames(data)==target,FALSE,TRUE)]
   
-  train_set = sample(nrow(data), 0.8 * nrow(data))
-  test_set = setdiff(seq_len(nrow(data)), train_set)
+  
+  train_set = read.csv(file = paste("./indeksy/train", openml_id, ".csv", sep = ""))$x
+  test_set = read.csv(file = paste("./indeksy/test", openml_id, ".csv", sep = ""))$x
   
   #IMPUTACJA
   time_mice <- Sys.time()
