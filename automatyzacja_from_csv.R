@@ -27,9 +27,9 @@ colnames(scores) <- c('Dataset','Method','Model', 'F1', 'acc')
 
 
 #AUTOMATYZACJA
-path <- "/home/piotr/Programowanie/WB/WB_PD2/imputed_data/"   #<<<<<=========
-folders <- c("median/", "softimpute/", "missmda/", "missForest/", "mice/")
-#folders <- c("median/")
+path <- "/home/piotr/Programowanie/WB/WB_PD2/imputed_data/"                       #<<<<<========= csv z imputacji, niżej z jakich metod
+#folders <- c("median/", "softimpute/", "missmda/", "missForest/", "mice/")
+folders <- c("median/")
 csv_df <- paste(path, folders, sep="")
 
 
@@ -38,9 +38,9 @@ for(i in script_paths[1:length(script_paths)]){
   #Załadowanie zbioru ze skryptu
   source(i, chdir=T)
   
-  if(openml_id==41278){
-    next
-  }
+  # if(openml_id==41278){     <<<<<<====== ew do pominięcia
+  #   next
+  # }
   
   for(j in 1:length(csv_df)){
     
@@ -75,11 +75,15 @@ for(i in script_paths[1:length(script_paths)]){
       #SCORES
       for(p in 1:length(model_results)){
           models <- c("xgb", "log_reg", "svm", "rf")
-          f1 <- F1_Score(y_true = df[test_id, target_column], y_pred = model_results[[p]])
+          precision <- Precision(df[test_id, target_column], model_results[[p]])
+          recall <- Recall(df[test_id, target_column], model_results[[p]])
+          f1 <- 2*precision*recall/(precision+recall)
+          if(is.nan(f1)){f1 <- 0}
           acc <- Accuracy(y_true = df[test_id, target_column], y_pred = model_results[[p]])
+          
           score <- t(c(openml_id, type_imputation, models[p], f1, acc))
           scores <- rbind(scores, score)
-          write.table(score, file = "./wyniki_csv/wyniki.csv", sep = ",", append = TRUE, quote = FALSE,
+          write.table(score, file = "./wyniki_csv/nazwa.csv", sep = ",", append = TRUE, quote = FALSE,  #<<<<===== nazwa csv
                       col.names = FALSE, row.names = FALSE)
       }
     }
