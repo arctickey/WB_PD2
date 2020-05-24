@@ -43,14 +43,14 @@ In case of preparing a data set for machine learning models we can generally dis
 For our study we decided to chose four packages designed for missing data imputation in R language and one self implemented basic technique:
 
 - **Mode and median**: Simple technique of filling missing values with mode (for categorical variables) and median (for continuous variables) of complete values in variable. Implemented with basic R language functions.
-- **mice**[[2]](https://cran.r-project.org/web/packages/mice/mice.pdf): Package allows to perform multivariate imputation by chained equations (MICE), which is a type of multiple imputation. The method is based on Fully Conditional Specification, where each incomplete variable is imputed by separate model.
-- **missMDA**[[3]](https://cran.r-project.org/web/packages/missMDA/missMDA.pdf): Package for multiple missing values imputation. Data sets are imputed with the principal component method, regularized iterative FAMD algorithm (factorial analysis for mixed data). First estimation of the number of dimensions for factorial analysis is essential.
-- **missFOREST**[[4]](https://cran.r-project.org/web/packages/missForest/missForest.pdf): Package can be used for imputation with predictions of random forest model, trained on complete observations. Package works on data with complex interactions and non-linear relations. Enables parallel calculations.
-- **softImpute**[[5]](https://cran.r-project.org/web/packages/softImpute/softImpute.pdf): Package for matrix imputation with nuclear-norm regularization. Algorithm works like EM, solving optimization problem using soft-thresholded SVD algorithm.  Works only with continuous variables.
-- **VIM**[[6]](https://cran.r-project.org/web/packages/VIM/VIM.pdf): Package for visualization and imputation of missing values. Offers iterative robust model-based imputation (IRMI). In each iteration, one variable is used as response variable and remaining variables as the regressors.
+- **mice**[@mice2011]: Package allows to perform multivariate imputation by chained equations (MICE), which is a type of multiple imputation. The method is based on Fully Conditional Specification, where each incomplete variable is imputed by separate model.
+- **missMDA**[@missMDA2016]: Package for multiple missing values imputation. Data sets are imputed with the principal component method, regularized iterative FAMD algorithm (factorial analysis for mixed data). First estimation of the number of dimensions for factorial analysis is essential.
+- **missFOREST**[@missForest2012]: Package can be used for imputation with predictions of random forest model, trained on complete observations. Package works on data with complex interactions and non-linear relations. Enables parallel calculations.
+- **softImpute**[@R-softImpute]: Package for matrix imputation with nuclear-norm regularization. Algorithm works like EM, solving optimization problem using soft-thresholded SVD algorithm.  Works only with continuous variables.
+- **VIM**[@VIM2016]: Package for visualization and imputation of missing values. Offers iterative robust model-based imputation (IRMI). In each iteration, one variable is used as response variable and remaining variables as the regressors.
 
 #### Data source and preparation
-For test purposes we used 11 dataset form OpenML library, available here https://www.openml.org/search?type=data. Every dataset is designed for binary classification and most of them contains numerical and categorical features.  
+For test purposes we used 11 dataset form OpenML library [@R-OpenML]. Every dataset is designed for binary classification and most of them contains numerical and categorical features.  
 
 Before imputacien datasets are prepared. Preperations are different for each dataset, but always include:
 
