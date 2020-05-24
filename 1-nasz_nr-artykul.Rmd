@@ -1,14 +1,22 @@
+---
+output:
+  pdf_document: default
+bibliography: ["cytowania.bib"]
+---
+
 ## Various data imputation techniques in R
 
 *Authors: Jan Borowski, Filip Chrzuszcz, Piotr Fic  (Warsaw University of Technology)*
 
 ### Abstract
 
-There are many suggestions how to deal with missing values in data sets problem. Some solutions are offered in publicly available packages for the R language. In our study, we tried to compare the quality of different methods of data imputation and their impact on the performance of machine learning models. We scored different algorithms on various data sets imputed by chosen packages. Results summary presents packages which enabled to achive the best models predictions metrics. Moreover, duration of imputation was measured. 
+There are many suggestions how to deal with missing values in data sets problem. Some solutions are offered in publicly available packages for the R language. In our study, we tried to compare the quality of different methods of data imputation and their impact on the performance of machine learning models. We scored different algorithms on various data sets imputed by chosen packages. Results summary presents packages which enabled to achieve the best models predictions metrics. Moreover, duration of imputation was measured. 
 
 ### Introduction and Motivation
 
-Missing observations in data sets is a common and difficult problem. In the field of machine learning, one of the key objects is the data set. Real-world data are often incomplete, which prevents the usage of many algorithms. Most implementations of machine learning models, available in popular packages, are not prepared to deal with missing values. Before creating a machine learning model, it is essential to solve the problem of missing observations. This requires user pre-processing of data. 
+#### Background an related work
+
+Missing observations in data sets is a common and difficult problem. In the field of machine learning, one of the key objects is the data set. Real-world data are often incomplete, which prevents the usage of many algorithms. Most implementations of machine learning models, available in popular packages, are not prepared to deal with missing values. Before creating a machine learning model, it is essential to solve the problem of missing observations. This requires user pre-processing of data. Some researches examined similarity between original and imputed data, in terms of descriptive statistics [@musil2002impcomp]. Missing data are common in medical sciences and impact of different imputation methods on analysis was measured [@bono2007medical]. Some studies show that imputation can improve the results of machine learning models and that more advanced techniques of imputation outperform basic solutions [@gustavo2003impclasif] [@su2008impclasif].    
 
 #### Motivation
 
@@ -16,7 +24,7 @@ Various imputation techniques are implemented in different packages for the R la
 
 #### Definition of missing data
 
-At the beginning, clariyfing the definition of missing data is necessary. Missing data means, that one or more variables have no data values in observations. This can be caused by various reasons, which we can formally define as follows, referring to Rubin [[1]](https://doi.org/10.1093/biomet/63.3.581):
+At the beginning, clariyfing the definition of missing data is necessary. Missing data means, that one or more variables have no data values in observations. This can be caused by various reasons, which we can formally define as follows, referring to @rubin1976mar:
 
 - MCAR (Missing completely at random)\
 Values are missing completely at random if the events that lead to lack of value are independent both of observable variable and of unobservable parameters. The missing data are simply a random subset of the data. Analysis performed on MCAR data is unbiased. However, data are rarely MCAR.
@@ -71,7 +79,7 @@ After the long and tedious process of data imputation it is finally time to eval
 ```{r echo=FALSE, message=FALSE, warning=FALSE , results='asis'}
 library(knitr)
 library(tidyverse)
-scores <- readr::read_csv('./wyniki_moje.csv')
+scores <- readr::read_csv('./wyniki_csv/wyniki_moje.csv')
 
 ramka <- scores %>% group_by(Method) %>% summarise(accuracy = round(mean(Acc),2),
                                           auc = round(mean(Auc),2),
@@ -135,3 +143,5 @@ Algorithms from that group had that quite high, which may be unacceptable while 
 Considering metrics scores achieved by evaluated model few important conlusions about imputation methods can be made. Basic approach with median and mode imputation allows to get decent results of machine learning model. Its disadvatage is large discrepancy in scores. More complex techniques available in packages, ensure more stable results of model among all data sets. From them, we can distinguish missFOREST, VIM irmi and mice. These packages have carried out the best imputation in terms of further model performance. They proved to be the most versatile, achiving the best average results of accuracy. VIM and missFOREST AUC scores show also the stability of model performance on imputed data set. SoftImpute package caused too low scores of recall and precision which suggests its poor performance on unbalanced data. MissMDA package performed worse than basic mode/median and all other methods, being able to proceed only on 6 from 11 data sets.  
 Second aspect to consider is time needed for imputation. MissFOREST achieved good metrics scores of model, but its very time consuming. Both VIM irmi and mice packages not only provided well imputed data sets but also were time efficient.  
 Choosing the best imputation tool may obviously depend on characteristic of the specific data sets, however our research should help to find flexible solution for everyday usage.
+
+### Bibliography
