@@ -92,70 +92,161 @@ After previous steps, we have got trained models and test sets. In the final ste
 
 
  
-### Results
+#### 5.Results
 
-After the long and tedious process of data imputation it is finally time to evaluate our methods of imputation. Methods were trained and tested on 11 datasets and evaluated strictly using these 4 methods mentioned earlier. Before score analysis it is worth mentioning that all algorithms were tested with basic parametres, so there is certainly some room for improvementm but for now we decided to leave these scores as they are. Table below presents average metrics achieved by model, depending on imputation method.
+After the long and tedious process of data imputation it is finally time to evaluate our methods of imputation. Methods were trained and tested on 11 datasets and evaluated strictly using 2 methods mentioned earlier. Before score analysis it is worth mentioning that all algorithms were tested with optimal parameters, so score should be quite meaningful. Table below presents average metrics achieved by model, depending on imputation method. As described earlier, we decided to use two measures of algorithm effectiveness:
+
+- F1 score
+- Accuracy
+
+These two measures complement each other well because they allow us to measure well the effectiveness of our imputations and algorithms on both balanced and unbalanced sets.
 ```{r echo=FALSE, message=FALSE, warning=FALSE , results='asis'}
 library(knitr)
 library(tidyverse)
-scores <- readr::read_csv('./wyniki_csv/wyniki_moje.csv')
-
-ramka <- scores %>% group_by(Method) %>% summarise(accuracy = round(mean(Acc),2),
-                                          auc = round(mean(Auc),2),
-                                          precision = round(mean(Precision),2),
-                                          recall = round(mean(Recall),2))
-
+scores <- readr::read_csv('./final_score/ostateczne.csv')
+ramka <- scores %>% group_by(Method) %>% summarise(Accuracy = round(mean(Acc),2),F1 = round(mean(F1),2))
 knitr::kable(ramka,caption='Average scores of model on imputation methods')
 ```
 
 Our experiment definately did not find out the best imputation algoriithm, but we can derive some interesting conclusions from it.
 First of all, we are going to treat median imputation as kind of a baseline for our algorithms. Suprisngly it seems to perform quite well, amongst the others, often quite sophisticated methods. It achieved over 80% of accuracy on average. However, it is hard to decide whether it is a high score or not, because we are only able to compare algorithms between the others. To say anything more meanigful about our methods we shall look at the distribution of the scores in order to make a better analysis of performance.\
 
+\newpage
+##### Distributions of scores
 
-#### ROC AUC score
-
-As mentioned earlier we decided to use a few metrics to compare algorithms. One of it is ROC AUC score. It is a measure which caluclates TPR (which is ratio beetwen our predicted positive examples over overall amount of positive examples) and FPR (which is ratio beetwen false positives and all negative examples). Next TPR and FPR are evaluated at different thershold values and than we have something called ROC curve. Our measure is simply the area under that curve. Obviously the maximum of that score is 1. ROC AUC is also quite good for working with imbalanced sets, which may be useful for us, because we had to deal with such in our experiment.
+##### Accuracy
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
-p<-ggplot(scores, aes(x=Method, y=Auc, color=Method)) +
-  geom_boxplot()+theme_minimal()+labs(x="",y="")+ggtitle("ROC AUC among different imputations")
+p<-ggplot(scores, aes(x=Method, y=Acc, color=Method)) +
+  geom_boxplot()+theme_minimal()+labs(x="",y="")+ggtitle("Mean accuracy among different imputations")
 p
 ```
 
-Taking a brief look at the distributions of the scores it is clear that median is not so good. Its scores seems to vary the most among datasets, which is not something we ideally want. Also it is worth noting that unfortunately missMDA achieved the worse score and also was the most problematic imputation technic from which we tested. It did not manage the perform its imputations on 5 out of 11 datasets, which clearly disqualify this method from everyday usage. Also softimpute had problem with working on all sets, albeit it managed to perform quite decent scores. On the other end are VIM irmi, missFOREST and Mice. All of these three packages managed to make imputations on all sets, and achieved good scores.
+Taking a brief look at the distributions of accuracy score it seems quite unclear which algorithm performs the best. All medians seem to be aproximately on the same level and also first and third quartile of almost all of the plots have the same value. Only missmda is a bit lower than the others, but this is too early to derive any conclusions.\
 
-#### Precision and recall
-Moving further into score analysis we need to focus on two undeniably important parameters, which are precision and recall. We can understand recall as an ability of a model to find all the relevant cases within a dataset, while precision  expresses the proportion of the data our model says was relevant actually were relevant. Ideally we would like to make both of these metrics as high, as possible, which is of course not so possible. Instead we can focus on one of these two depending what problem we are solving. However, in our experiment we are not capable to say which metric is more important for us, so we can simply compare them, and on that basis say something about our methods.
+Let's check standard deviation of scores.
 
-```{r echo=FALSE, message=FALSE, warning=FALSE,fig.width=4.5,fig.height=5,fig.show='hold'}
-p<-ggplot(scores, aes(x=Method, y=Precision, color=Method)) +
-  geom_boxplot()+theme_minimal()+labs(x="",y="")+ggtitle("Precision among different imputations")
-p1<-ggplot(scores, aes(x=Method, y=Recall, color=Method)) +
-  geom_boxplot()+theme_minimal()+labs(x="",y="")+ggtitle("Recall among different imputations")
-p
-p1
+```{r echo=FALSE, message=FALSE,warning=FALSE}
+knitr::kable(scores%>% group_by(Method) %>% summarise(acc_std=sd(Acc,na.rm=TRUE)))
 ```
 
-We can now focus on brief analysis of the best scores, which our methods managed to achieve. In terms of precision VIM irmi, missFOREST and Mice achieved almost the same scores, with Mice having the most compact scores. Despite that scores quite comparable with these which we have seen on ROC AUC scores, so it will be more interesting to move on for recall scores. Here once again VIM irmi leads with the highest median of scores, however ironically median imputing has the second median of scores here. After looking at its scores, we can derive our first bold conclusion. Namely it is worth to use median imputation when we aim for decent scores and do not care about dispersion of it. Quite simmilary to the previous scores mice and missFOREST were close to the leaders and softImpute and missMDA were at the back of the field.
+Deviation of scores seem to be quite equal for all of the methods so it will not be an issue.
 
-#### Time of imputations
+\newpage
 
-The last topic we wish to consider in our analysis section is the time of imputations. It is quite significant, because even the best imputation may become redundant if it has too long working time.
+##### F1
 
-```{r echo=FALSE, message=FALSE, warning=FALSE,fig.width=4.5,fig.height=5,fig.show='hold'}
-p<-ggplot(scores, aes(x=Method, y=Time, color=Method)) +
-  geom_boxplot()+theme_minimal()+labs(x="",y="")+ggtitle("Time in seconds ")
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+p<-ggplot(scores, aes(x=Method, y=F1, color=Method)) +
+  geom_boxplot()+theme_minimal()+labs(x="",y="")+ggtitle("Mean F1 among different imputations")
 p
 ```
 
-We can divide our algorithms into two groups. In the first one, there are:\
-- VIM irmi\
-- Median\
-- Mice\
-- SoftImpute\
-This group is simply characterised by very low time need to peroform the imputation. Second group consists of: \
-- missFOREST\
-- missMDA\
-Algorithms from that group had that quite high, which may be unacceptable while working with huge datasets.
+F1 scores give us much more informations. First thing that becomes apparent after looking at that plot is fact that we do have some very low values for every type of imputation. However this is simply because some of our datasetes were very small, saw neither of our algorithms were able to achieve recall above 0. Beside from that once again scores of all algorithms were quite close to each other. This is why we decide to use two different methods of comparing and classifying these algortihms, so that we will be able to choose our winner.
+
+The same like before let's check standard deviation to ensure that our measurments will not be biased by it.
+
+```{r echo=FALSE, message=FALSE,warning=FALSE}
+knitr::kable(scores%>% group_by(Method) %>% summarise(F1_std=sd(F1,na.rm=TRUE)))
+```
+
+Once again scores are quite equal, but the raw numbers are a bit higher, purely because of the reasons that we described earlier, which was the problem of not balanced datasets.
+
+\newpage
+
+#### Median baseline score
+
+As a more reliable sample of imputation assessment we use to arrange them according to the application of the scheme. Let's take the result of each imputation method on each set. We define this result as the average of all machine processing algorithms released on data collected using imputation. Choose, we sort the result from the highest and we will assign algorithms points for each place. Finally, we add points and the method of imputation which points are the most important will win our ranking.
+
+```{r echo=FALSE, message=FALSE,warning=FALSE}
+
+library(R.utils)
+library(prob)
+dane_o_imputacij <- scores
+ids <- dane_o_imputacij$Dataset
+x <- c(1,2,3)
+algosy <- c('log_reg','xgb','rf','svm')
+
+for (i in ids) {
+  
+  indeksy <- ifelse(dane_o_imputacij$Dataset==i,TRUE,FALSE)
+  dane_id <-  dane_o_imputacij[indeksy,]
+  expectet <- c('median','softimpute','missmda','mice','VIM','missForest')
+  founded <- dane_id$Method
+  insert_<- setdiff(expectet,founded)
+  
+  for (j in insert_){
+    for(a in algosy){
+  dane_o_imputacij <- rbind(dane_o_imputacij,c(1,i,j,a,0,0))
+  
+  }
+  dane_wynik <- dane_o_imputacij
+  }
+}
+data<- dane_wynik
+data$F1 <- as.double(data$F1)
+data$acc <- as.double(data$Acc)
+
+data[is.na(data)] <- 0
+data3 <- data %>% group_by(Dataset,Method) %>% summarise(mean=mean(acc,na.rm=TRUE))
+order_scores <- data3 %>% group_by(Dataset) %>% mutate(good_ranks = rank(-mean, ties.method = "max"))
+order_scores1 <- order_scores %>% group_by(Method) %>% summarise(wynik = sum(good_ranks))
+
+order_scores1 <- order_scores1[order(order_scores1$wynik),]
+knitr::kable(order_scores1)
+```
+
+
+After these comparisons we seem to have measure of algorithms perfromarnce. We cannot clearly compare by numbers, but the order which we present here may be quite useful to present how well algortihms work.
+
+
+```{r echo=FALSE, message=FALSE,warning=FALSE}
+data3 <- data %>% group_by(Dataset,Method) %>% summarise(mean=mean(F1,na.rm=TRUE))
+order_scores <- data3 %>% group_by(Dataset) %>% mutate(good_ranks = rank(-mean, ties.method = "max"))
+order_scores1 <- order_scores %>% group_by(Method) %>% summarise(wynik = sum(good_ranks))
+
+order_scores1 <- order_scores1[order(order_scores1$wynik),]
+knitr::kable(order_scores1)
+```
+
+And the same thing for F1 score. Because of the fact, that plenty of datasets we used were not balanced we decide to use F1 score as our main measure, because it is able to operate better on such datasets.
+
+##### Best model by F1 measure
+
+The process which we described earlier may be also quite useful to find the best classification alghoritm among tested. That process may
+
+```{r echo=FALSE, message=FALSE,warning=FALSE}
+data3 <- data %>% group_by(Dataset,Algorithm) %>% summarise(mean=mean(F1,na.rm=TRUE))
+order_scores <- data3 %>% group_by(Dataset) %>% mutate(good_ranks = rank(-mean, ties.method = "max"))
+order_scores1 <- order_scores %>% group_by(Algorithm) %>% summarise(wynik = sum(good_ranks))
+
+order_scores1 <- order_scores1[order(order_scores1$wynik),]
+knitr::kable(order_scores1[1:4,])
+```
+
+Results which we gained are quite interesing, but we are afraid that some scores may be biased because of the fact that we had some very small datasets available in training which may have forced some algorithms to overfit. Nevertheless SVM scored the best with a reasonable margin above the others.
+
+\newpage
+
+#### Second approach
+
+As the second form of ranking imputation algorithms, we decided to use the following formula. We treat the median as the basic form of imputation and we will compare it to all other methods. We want to check how much the average prediction measured made by other algorithms differed from the median. As one prediction, we understand the average of all imputation methods
+
+
+```{r echo=FALSE, message=FALSE,warning=FALSE}
+data5 <- data %>% group_by(Dataset,Method) %>% summarise(mean=mean(F1,na.rm=TRUE))
+un <- length(unique(data5$Dataset))
+data5[data5$Method=='median','method'] = 'aaamedian'
+order_scores2 <- data5 %>% group_by(Dataset) %>% mutate(diff = max(mean) - mean)
+order_scores2 <- data5 %>% group_by(Dataset) %>% mutate(diff = mean - dplyr::lag(mean, default = mean[1]))
+scores <- order_scores2 %>% group_by(Method) %>% summarise(score = sum(diff)/un)
+x <- scores[scores$Method!='aaamedian',]
+x <- scores[x$Method!='median',]
+knitr::kable(x[order(x$score,decreasing = TRUE),])
+
+```
+
+Result are quite simmilar to what we have achieved earlier, but here we can capture the difference which some algorithms have compared with median imputing. Difference can be even up to 0.1 in F1 score which is an considerable amount.
+
 
 ### Summary and conclusions 
 
