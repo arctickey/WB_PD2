@@ -55,7 +55,7 @@ For test purposes we used 14 datasets form OpenML library [@R-OpenML]. Every dat
 - Converting date to more than one column (for example "2018-03-31" can be converted to three column year, month and day)
 - Removing or converting columns with too many categories
 
-After cleaning datasets were transferred to the next step. 
+After cleaning data sets were transferred to the next step. 
 
 #### 2.Data Imputation
 Clean datasets were split into two data sets train and test in proportion $1/4$ respectively. This split was performed randomly and only once for every dataset that's mean every imputation technique used the same split. Imputation was performed separately for train and test sets. Before split we also remove the target column to avoid using it in imputation. For our study, we decided to choose five packages designed for missing data imputation in the R language and one self-implemented basic technique:
@@ -75,7 +75,7 @@ MissForest algorithm can be used on both numeric and categorical features and is
 Imputation method from Mice package also can be run on all types of data.
 Iterative Robust Model-Based Imputation method from VIM package can impute all types of data. This method additionally creates new columns with information whether observation was imputed or not. We decided to do not use these columns, because other methods do not create them.
 Last method which we covered is missMDA which also can be used to input numeric and categorical features.
-After imputation we add back target variable to both sets. All methods work on the same parameters for all datasets. In case when for some reason method can't input some dataset it was treated like "worst result" more information about it can be found in section 4.Model evaluation.
+After imputation we add back target variable to both sets. All methods work on the same parameters for all data sets. In case when for some reason method can't input some data set it was treated like "worst result" more information about it can be found in section 4.Model evaluation.
 
 #### 3.Model traing 
 For classification task we use four classification algorithms:
@@ -85,11 +85,10 @@ For classification task we use four classification algorithms:
 - Support Vector Machines,
 - Linear Regression 
 
-All methods were implemented in **mlr** package [@mlr] for hyperparameter tuning we also use methods form the dame package. For all data sets four classifications were trained and tuned on the same train sets. To select params we used Grid Search. We will not focus on this part of the experiment. The most important part in this step is that every imputation was proceeded the same whats mean different in results can be caused  
-only by different imputation Technik. 
+All methods were implemented in **mlr** package [@mlr] for hyperparameters tuning, we also used methods from the same package. For all data sets four classifiers were trained and tuned on the same train sets. To select parameters we used Grid Search. We will not focus on this part of the experiment. The most important part in this step, is that every model training was proceeded the same way. This mean that differences in results can be caused only by influence of previously used imputation technique. 
 
 #### 4.Model evaluation 
-After previous steps we have trained models and test sets. In the final step we evaluate model and imputation. For every imputation and algorithm we calculate F1 score expres by formula $2\frac{(precision)*(recall)}{precision + recall}$ and accuracy. In case when imputation algorithm fail to impute some dataset results for this set are thread as "the worst result" it means if u try to carte a ranking it is always last (if more then one imputation fail all of them is placed last). A detailed discussion about results in the next section.
+After previous steps, we have got trained models and test sets. In the final step we evaluate model and imputation. For every imputation and algorithm we calculate F1 score expressed by formula $2\frac{(precision)*(recall)}{precision + recall}$ and accuracy. In case when imputation algorithm fail to impute some data set results for this set are thread as "the worst result". It means if u try to create a ranking it is always last (if more then one imputation fail all of them is placed last). A detailed discussion about results in the next section.
 
 
  
