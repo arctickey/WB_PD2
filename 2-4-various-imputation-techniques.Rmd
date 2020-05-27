@@ -14,9 +14,9 @@ There are many suggestions how to deal with missing values in data sets problem.
 
 ### Introduction and Motivation
 
-#### Background an related work
+#### Background and related work
 
-Missing observations in data sets is a common and difficult problem. In the field of machine learning, one of the key objects is the data set. Real-world data are often incomplete, which prevents the usage of many algorithms. Most implementations of machine learning models, available in popular packages, are not prepared to deal with missing values. Before creating a machine learning model, it is essential to solve the problem of missing observations. This requires user pre-processing of data. Some researches examined similarity between original and imputed data, in terms of descriptive statistics [@musil2002impcomp]. Missing data are common in medical sciences and impact of different imputation methods on analysis was measured [@bono2007medical]. Some studies show that imputation can improve the results of machine learning models and that more advanced techniques of imputation outperform basic solutions [@gustavo2003impclasif] [@su2008impclasif].    
+Missing observations in data sets is a common and difficult problem. In the field of machine learning, one of the key objects is the data set. Real-world data are often incomplete, which prevents the usage of many algorithms. Most implementations of machine learning models, available in popular packages, are not prepared to deal with missing values. Before creating a machine learning model, it is essential to solve the problem of missing observations. This requires user pre-processing of data. Some researches examined similarity between original and imputed data, in terms of descriptive statistics [@2_4_musil2002impcomp]. Missing data are common in medical sciences and impact of different imputation methods on analysis was measured [@2_4_bono2007medical]. Some studies show that imputation can improve the results of machine learning models and that more advanced techniques of imputation outperform basic solutions [@2_4_gustavo2003impclasif] [@2_4_su2008impclasif].    
 
 #### Motivation
 
@@ -24,7 +24,7 @@ Various imputation techniques are implemented in different packages for the R la
 
 #### Definition of missing data
 
-At the beginning, clariyfing the definition of missing data is necessary. Missing data means, that one or more variables have no data values in observations. This can be caused by various reasons, which we can formally define as follows, referring to @rubin1976mar:
+At the beginning, clarifying the definition of missing data is necessary. Missing data means, that one or more variables have no data values in observations. This can be caused by various reasons, which we can formally define as follows, referring to @2_4_rubin1976mar:
 
 - MCAR (Missing completely at random)\
 Values are missing completely at random if the events that lead to lack of value are independent both of observable variable and of unobservable parameters. The missing data are simply a random subset of the data. Analysis performed on MCAR data is unbiased. However, data are rarely MCAR.
@@ -47,8 +47,8 @@ Experiment like this one can be performed involving many techniques we decide to
 
 Bellow we will explain every step in detail.
 
-#### 1. Data Preperation 
-For test purposes we used 14 datasets form OpenML library [@R-OpenML]. Every dataset is designed for binary classification and most of them contain numerical and categorical features. Most of the sets have a similar number of observations in both classes but some of them were very unbalanced. Before data imputation data set was prepared specific preparation are different for each data set but we commonly do:
+#### Data Preperation 
+For test purposes we used 14 data sets form OpenML library [@2_4_R-OpenML]. Every data set is designed for binary classification and most of them contain numerical and categorical features. Most of the sets have a similar number of observations in both classes but some of them were very unbalanced. Before data imputation data set was prepared specific preparation are different for each data set but we commonly do:
 
 - Removing features which didn't contain useful information (for example all observation have the same value)
 - Correcting typos and converting all string to lower case to reduce the number of categories 
@@ -57,15 +57,15 @@ For test purposes we used 14 datasets form OpenML library [@R-OpenML]. Every dat
 
 After cleaning data sets were transferred to the next step. 
 
-#### 2.Data Imputation
-Clean datasets were split into two data sets train and test in proportion $1/4$ respectively. This split was performed randomly and only once for every dataset that's mean every imputation technique used the same split. Imputation was performed separately for train and test sets. Before split we also remove the target column to avoid using it in imputation. For our study, we decided to choose five packages designed for missing data imputation in the R language and one self-implemented basic technique:
+#### Data Imputation
+Clean data sets were split into two data sets train and test in proportion $1/4$ respectively. This split was performed randomly and only once for every data set that's mean every imputation technique used the same split. Imputation was performed separately for train and test sets. Before split we also remove the target column to avoid using it in imputation. For our study, we decided to choose five packages designed for missing data imputation in the R language and one self-implemented basic technique:
 
 - **Mode and median**: Simple technique of filling missing values with mode (for categorical variables) and median (for continuous variables) of complete values in a variable. Implemented with basic R language functions.
-- **mice**[@mice2011]: Package allows to perform multivariate imputation by chained equations (MICE), which is a type of multiple imputation. The method is based on Fully Conditional Specification, where each incomplete variable is imputed by separate model.
-- **missMDA**[@missMDA2016]: Package for multiple missing values imputation. Data sets are imputed with the principal component method, regularized iterative FAMD algorithm (factorial analysis for mixed data). First estimation of the number of dimensions for factorial analysis is essential.
-- **missFOREST**[@missForest2012]: Package can be used for imputation with predictions of random forest model, trained on complete observations. Package works on data with complex interactions and non-linear relations. Enables parallel calculations.
-- **softImpute**[@R-softImpute]: Package for matrix imputation with nuclear-norm regularization.  Algorithm works like EM, solving an optimization problem using a soft-thresholded SVD algorithm.  Works only with continuous variables.
-- **VIM**[@VIM2016]: Package for visualization and imputation of missing values. It offers iterative robust model-based imputation (IRMI). In each iteration, one variable is used as a response variable and the remaining variables as the regressors.
+- **mice**[@2_4_mice2011]: Package allows to perform multivariate imputation by chained equations (MICE), which is a type of multiple imputation. The method is based on Fully Conditional Specification, where each incomplete variable is imputed by separate model.
+- **missMDA**[@2_4_missMDA2016]: Package for multiple missing values imputation. Data sets are imputed with the principal component method, regularized iterative FAMD algorithm (factorial analysis for mixed data). First estimation of the number of dimensions for factorial analysis is essential.
+- **missFOREST**[@2_4_missForest2012]: Package can be used for imputation with predictions of random forest model, trained on complete observations. Package works on data with complex interactions and non-linear relations. Enables parallel calculations.
+- **softImpute**[@2_4_R-softImpute]: Package for matrix imputation with nuclear-norm regularization.  Algorithm works like EM, solving an optimization problem using a soft-thresholded SVD algorithm.  Works only with continuous variables.
+- **VIM**[@2_4_VIM2016]: Package for visualization and imputation of missing values. It offers iterative robust model-based imputation (IRMI). In each iteration, one variable is used as a response variable and the remaining variables as the regressors.
 
 
 First we use mode/median imputation, which is a very simple method and it is used as a base result for more complex algorithms to compare.
@@ -77,7 +77,7 @@ Iterative Robust Model-Based Imputation method from VIM package can impute all t
 Last method which we covered is missMDA which also can be used to input numeric and categorical features.
 After imputation we add back target variable to both sets. All methods work on the same parameters for all data sets. In case when for some reason method can't input some data set it was treated like "worst result" more information about it can be found in section 4.Model evaluation.
 
-#### 3.Model traing 
+#### Model traing 
 For classification task we use four classification algorithms:
 
 - Extreme Gradient Boosting, 
@@ -85,14 +85,12 @@ For classification task we use four classification algorithms:
 - Support Vector Machines,
 - Linear Regression 
 
-All methods were implemented in **mlr** package [@mlr] for hyperparameters tuning, we also used methods from the same package. For all data sets four classifiers were trained and tuned on the same train sets. To select parameters we used Grid Search. We will not focus on this part of the experiment. The most important part in this step, is that every model training was proceeded the same way. This mean that differences in results can be caused only by influence of previously used imputation technique. 
+All methods were implemented in **mlr** package [@2_4_mlr] for hyperparameters tuning, we also used methods from the same package. For all data sets four classifiers were trained and tuned on the same train sets. To select parameters we used Grid Search. We will not focus on this part of the experiment. The most important part in this step, is that every model training was proceeded the same way. This mean that differences in results can be caused only by influence of previously used imputation technique. 
 
-#### 4.Model evaluation 
-After previous steps, we have got trained models and test sets. In the final step we evaluate model and imputation. For every imputation and algorithm we calculate F1 score expressed by formula $2\frac{(precision)*(recall)}{precision + recall}$ and accuracy. In case when imputation algorithm fail to impute some data set results for this set are thread as "the worst result". It means if u try to create a ranking it is always last (if more then one imputation fail all of them is placed last). A detailed discussion about results in the next section.
+#### Model evaluation 
+After previous steps, we have got trained models and test sets. In the final step we evaluate model and imputation. For every imputation and algorithm we calculate F1 score expressed by formula $2\frac{(precision)\cdot(recall)}{precision + recall}$ and accuracy. In case when imputation algorithm fail to impute some data set results for this set are thread as "the worst result". It means if u try to create a ranking it is always last (if more then one imputation fail all of them is placed last). A detailed discussion about results in the next section.
 
-
- 
-#### 5.Results
+### Results
 
 After the long and tedious process of data imputation it is finally time to evaluate our methods of imputation. Methods were trained and tested on 11 datasets and evaluated strictly using 2 methods mentioned earlier. Before score analysis it is worth mentioning that all algorithms were tested with optimal parameters, so score should be quite meaningful. Table below presents average metrics achieved by model, depending on imputation method. As described earlier, we decided to use two measures of algorithm effectiveness:
 
