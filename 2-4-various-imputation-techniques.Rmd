@@ -101,7 +101,7 @@ These two measures complement each other well because they allow us to measure w
 ```{r echo=FALSE, message=FALSE, warning=FALSE , results='asis'}
 library(knitr)
 library(tidyverse)
-scores <- readr::read_csv('./final_score/ostateczne.csv')
+scores <- readr::read_csv('./final_score/ostatecznev2.csv')
 ramka <- scores %>% group_by(Method) %>% summarise(Accuracy = round(mean(Acc),2),F1 = round(mean(F1),2))
 knitr::kable(ramka,caption='Average scores of model on imputation methods')
 ```
