@@ -92,7 +92,7 @@ After previous steps, we have got trained models and test sets. In the final ste
 
 ### Results
 
-After the long and tedious process of data imputation it is finally time to evaluate our methods of imputation. Methods were trained and tested on 11 datasets and evaluated strictly using 2 methods mentioned earlier. Before score analysis it is worth mentioning that all algorithms were tested with optimal parameters, so score should be quite meaningful. Table below presents average metrics achieved by model, depending on imputation method. As described earlier, we decided to use two measures of algorithm effectiveness:
+After the long and tedious process of data imputation it is finally time to evaluate our methods of imputation. Methods were trained and tested on 14 datasets and evaluated strictly using 2 methods mentioned earlier. Before score analysis it is worth mentioning that all algorithms were tested with optimal parameters, so score should be quite meaningful. Table below presents average metrics achieved by model, depending on imputation method. As described earlier, we decided to use two measures of algorithm effectiveness:
 
 - F1 score
 - Accuracy
@@ -107,56 +107,33 @@ knitr::kable(ramka,caption='Average scores of model on imputation methods')
 ```
 
 Our experiment definately did not find out the best imputation algoriithm, but we can derive some interesting conclusions from it.
-First of all, we are going to treat median imputation as kind of a baseline for our algorithms. Suprisngly it seems to perform quite well, amongst the others, often quite sophisticated methods. It achieved over 80% of accuracy on average. However, it is hard to decide whether it is a high score or not, because we are only able to compare algorithms between the others. To say anything more meanigful about our methods we shall look at the distribution of the scores in order to make a better analysis of performance.\
+First of all, we can think about median imputation as kind of our baseline because it will be useful later. Suprisngly it seems to perform quite well, amongst the others, often quite sophisticated methods. It achieved over 80% of accuracy on average. However, it is hard to decide whether it is a high score or not, because we are only able to compare algorithms between the others. To say anything more meanigful about our methods we shall look at the distribution of the scores in order to make a better analysis of performance.\
 
 \newpage
 ##### Distributions of scores
 
-##### Accuracy
-```{r echo=FALSE, message=FALSE, warning=FALSE}
-p<-ggplot(scores, aes(x=Method, y=Acc, color=Method)) +
-  geom_boxplot()+theme_minimal()+labs(x="",y="")+ggtitle("Mean accuracy among different imputations")
-p
+```{r echo=FALSE, message=FALSE, warning=FALSE,fig.width=3, fig.height=3.5,fig.show='hold',fig.align='center'}
+p1<-ggplot(scores, aes(x=Method, y=Acc, color=Method)) +
+  geom_boxplot()+theme_minimal()+labs(x="",y="")+theme( axis.text.x=element_blank())+ggtitle('Accuracy')
+p2<-ggplot(scores, aes(x=Method, y=F1, color=Method)) + 
+  geom_boxplot()+theme_minimal()+labs(x="",y="")+theme(axis.text.x=element_blank())+ggtitle('F1')
+p1
+p2
+
 ```
 
 Taking a brief look at the distributions of accuracy score it seems quite unclear which algorithm performs the best. All medians seem to be aproximately on the same level and also first and third quartile of almost all of the plots have the same value. Only missmda is a bit lower than the others, but this is too early to derive any conclusions.\
 
-Let's check standard deviation of scores.
-
-```{r echo=FALSE, message=FALSE,warning=FALSE}
-knitr::kable(scores%>% group_by(Method) %>% summarise(acc_std=sd(Acc,na.rm=TRUE)))
-```
-
-Deviation of scores seem to be quite equal for all of the methods so it will not be an issue.
-
-\newpage
-
-##### F1
-
-```{r echo=FALSE, message=FALSE, warning=FALSE}
-p<-ggplot(scores, aes(x=Method, y=F1, color=Method)) +
-  geom_boxplot()+theme_minimal()+labs(x="",y="")+ggtitle("Mean F1 among different imputations")
-p
-```
-
 F1 scores give us much more informations. First thing that becomes apparent after looking at that plot is fact that we do have some very low values for every type of imputation. However this is simply because some of our datasetes were very small, saw neither of our algorithms were able to achieve recall above 0. Beside from that once again scores of all algorithms were quite close to each other. This is why we decide to use two different methods of comparing and classifying these algortihms, so that we will be able to choose our winner.
 
-The same like before let's check standard deviation to ensure that our measurments will not be biased by it.
 
-```{r echo=FALSE, message=FALSE,warning=FALSE}
-knitr::kable(scores%>% group_by(Method) %>% summarise(F1_std=sd(F1,na.rm=TRUE)))
-```
-
-Once again scores are quite equal, but the raw numbers are a bit higher, purely because of the reasons that we described earlier, which was the problem of not balanced datasets.
-
-\newpage
 
 #### Median baseline score
 
-As a more reliable sample of imputation assessment we use to arrange them according to the application of the scheme. Let's take the result of each imputation method on each set. We define this result as the average of all machine processing algorithms released on data collected using imputation. Choose, we sort the result from the highest and we will assign algorithms points for each place. Finally, we add points and the method of imputation which points are the most important will win our ranking.
+So to begin with we decided to  treat the median as the basic form of imputation and we will compare it to all other methods. We want to check how much the average prediction measured made by other algorithms differed from the median. As one prediction, we understand the average F1 score made by of all imputation methods on one dataset. 
+
 
 ```{r echo=FALSE, message=FALSE,warning=FALSE}
-
 library(R.utils)
 library(prob)
 dane_o_imputacij <- scores
@@ -188,68 +165,61 @@ data[is.na(data)] <- 0
 data3 <- data %>% group_by(Dataset,Method) %>% summarise(mean=mean(acc,na.rm=TRUE))
 order_scores <- data3 %>% group_by(Dataset) %>% mutate(good_ranks = rank(-mean, ties.method = "max"))
 order_scores1 <- order_scores %>% group_by(Method) %>% summarise(wynik = sum(good_ranks))
-
 order_scores1 <- order_scores1[order(order_scores1$wynik),]
-knitr::kable(order_scores1)
-```
+colnames(order_scores1) <- c('Method','Score')
 
 
-After these comparisons we seem to have measure of algorithms perfromarnce. We cannot clearly compare by numbers, but the order which we present here may be quite useful to present how well algortihms work.
-
-
-```{r echo=FALSE, message=FALSE,warning=FALSE}
-data3 <- data %>% group_by(Dataset,Method) %>% summarise(mean=mean(F1,na.rm=TRUE))
-order_scores <- data3 %>% group_by(Dataset) %>% mutate(good_ranks = rank(-mean, ties.method = "max"))
-order_scores1 <- order_scores %>% group_by(Method) %>% summarise(wynik = sum(good_ranks))
-
-order_scores1 <- order_scores1[order(order_scores1$wynik),]
-knitr::kable(order_scores1)
-```
-
-And the same thing for F1 score. Because of the fact, that plenty of datasets we used were not balanced we decide to use F1 score as our main measure, because it is able to operate better on such datasets.
-
-##### Best model by F1 measure
-
-The process which we described earlier may be also quite useful to find the best classification alghoritm among tested. That process may
-
-```{r echo=FALSE, message=FALSE,warning=FALSE}
-data3 <- data %>% group_by(Dataset,Algorithm) %>% summarise(mean=mean(F1,na.rm=TRUE))
-order_scores <- data3 %>% group_by(Dataset) %>% mutate(good_ranks = rank(-mean, ties.method = "max"))
-order_scores1 <- order_scores %>% group_by(Algorithm) %>% summarise(wynik = sum(good_ranks))
-
-order_scores1 <- order_scores1[order(order_scores1$wynik),]
-knitr::kable(order_scores1[1:4,])
-```
-
-Results which we gained are quite interesing, but we are afraid that some scores may be biased because of the fact that we had some very small datasets available in training which may have forced some algorithms to overfit. Nevertheless SVM scored the best with a reasonable margin above the others.
-
-\newpage
-
-#### Second approach
-
-As the second form of ranking imputation algorithms, we decided to use the following formula. We treat the median as the basic form of imputation and we will compare it to all other methods. We want to check how much the average prediction measured made by other algorithms differed from the median. As one prediction, we understand the average of all imputation methods
-
-
-```{r echo=FALSE, message=FALSE,warning=FALSE}
 data5 <- data %>% group_by(Dataset,Method) %>% summarise(mean=mean(F1,na.rm=TRUE))
 un <- length(unique(data5$Dataset))
 data5[data5$Method=='median','method'] = 'aaamedian'
 order_scores2 <- data5 %>% group_by(Dataset) %>% mutate(diff = max(mean) - mean)
 order_scores2 <- data5 %>% group_by(Dataset) %>% mutate(diff = mean - dplyr::lag(mean, default = mean[1]))
-scores <- order_scores2 %>% group_by(Method) %>% summarise(score = sum(diff)/un)
-x <- scores[scores$Method!='aaamedian',]
-x <- scores[x$Method!='median',]
+scores1 <- order_scores2 %>% group_by(Method) %>% summarise(score = sum(diff)/un)
+x <- scores1[scores1$Method!='aaamedian',]
+x <- scores1[x$Method!='median',]
+x$score <- round(x$score,2)
+
 knitr::kable(x[order(x$score,decreasing = TRUE),])
 
 ```
 
-Result are quite simmilar to what we have achieved earlier, but here we can capture the difference which some algorithms have compared with median imputing. Difference can be even up to 0.1 in F1 score which is an considerable amount.
+
+\newpage
+Results achieved here are quite surprising. First of all the maximum gain in F1 score is only 0.02 and it is achieved by softimpute. But what can bewilder the most is the fact that only 2 out of 5 algorithms managed to perform better than median. These scores can raise questions about the whole purpose of using sophisticated algorithms, but of course we are unable to say anything harsh about them yet. We can definately note that we need to be we careful while using these algorithms, because the may lead to huge loss in scores, even up to -0.11, as here it is shown with missmda. It is worth noting the order of the algorithms here, as we will use another method to compare the scores. 
+
+
+#### Second approach
+
+As a second approach we decide to simply rank each algorithm score on each dataset, and than award points for each place. As a result we sum up all of the points and the final score is the sum of the points across all datasets. Of course the algorithm with the lowest amount of points wins.
+
+```{r echo=FALSE, message=FALSE,warning=FALSE}
+knitr::kable(order_scores1)
+```
+
+Scores achieved here resemble these achieved here. The order is not the same, but the winner remains the same. Once again median imputation managed to perform very well, outperforming many complicated algorithms. We can say that our scores are stable, so conclusions taken from these scores can be taken seriously.
+
+
+#### Times
+As a final tool of comparing algorithms we decided to compare times of imputation. Obviously even the algorithm with the best score, butwith awful imputation time is considered useless, so this is important to take that factor to final evaluation.
+
+
+
+```{r echo=FALSE, message=FALSE,warning=FALSE,warning=FALSE,fig.width=4,fig.height=3,fig.show='hold',fig.align='center'}
+times <- read.csv('./final_score/final.csv')
+p3<-ggplot(times, aes(x=X, y=V2, color=X)) +
+  geom_boxplot()+theme_minimal()+labs(x="",y="Seconds")+ggtitle('Times')+theme(legend.title=element_blank())+theme(axis.text.x=element_blank())
+p3
+```
+
+As we can see times of imputations made by each algorithm can vary heavily. There is no point in creating rankings like we did to analyse scores achieved by algorithms, but it is simply worth noting that our previous winner - SoftImpute is very quick, its plot looks the same as the Median plot, which is quite an achievment.
+On the other side there is Mice, which times can reach very high values.
+
 
 
 ### Summary and conclusions 
 
-Considering metrics scores achieved by evaluated model few important conlusions about imputation methods can be made. Basic approach with median and mode imputation allows to get decent results of machine learning model. Its disadvatage is large discrepancy in scores. More complex techniques available in packages, ensure more stable results of model among all data sets. From them, we can distinguish missFOREST, VIM irmi and mice. These packages have carried out the best imputation in terms of further model performance. They proved to be the most versatile, achiving the best average results of accuracy. VIM and missFOREST AUC scores show also the stability of model performance on imputed data set. SoftImpute package caused too low scores of recall and precision which suggests its poor performance on unbalanced data. MissMDA package performed worse than basic mode/median and all other methods, being able to proceed only on 6 from 11 data sets.  
-Second aspect to consider is time needed for imputation. MissFOREST achieved good metrics scores of model, but its very time consuming. Both VIM irmi and mice packages not only provided well imputed data sets but also were time efficient.  
-Choosing the best imputation tool may obviously depend on characteristic of the specific data sets, however our research should help to find flexible solution for everyday usage.
+Summing up all of our work we can say, that we managed to find plenty of interesting things about all of these imputation algorithms and the way they deal we different data. However it is hard to issue the final judgments, because of the fact that we only had 14 datasets available. Despite that, something definately can be said. First of all it is worth noting how well simple methods of imputation have managed to perform. Median imputation was tough competitor and have been outperformed rarely in our tests. Second issue is the matter of choosing the optimal metric for checking the performance of imputation algorithms. We have shown 2 different approaches and scores they achieved differed slightly. Taking that into consideration we cannot say that we have a clear winner in our competition, but we can give some sort of an advice for all interesting in imputing their datasets. The advice is quite simple, but what we have managed to show quite powerful. The case is to start imputing your dataset with the most basic method, which is median imputing, and then trying to beat its score with different algorithm, for example SoftImpute, which in our tests managed to perform quite well.
+
+\newpage
 
 ### Bibliography
