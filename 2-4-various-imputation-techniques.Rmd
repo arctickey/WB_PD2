@@ -103,7 +103,7 @@ These two measures complement each other well because they allow us to measure w
 |VIM        |     0.85| 0.76|
 
 Our experiment did not find out the best imputation algorithm, but we can derive some interesting conclusions from it.
-First of all, we can think about the median/mode imputation as kind of our baseline because it will be useful later. Surprisingly it seems to perform quite well, among the others, often quite sophisticated methods. It achieved over 80% of accuracy on average. However, it is hard to decide whether it is a high score or not, because we are only able to compare algorithms between the others. To say anything more meaningful about our methods we shall look at the distribution of the scores to make a better analysis of performance.\
+First of all, we can think about the median/mode imputation as kind of our baseline because it will be useful later. Surprisingly it seems to perform quite well, among the others, often quite sophisticated methods. It achieved over 80% of accuracy on average. However, it is hard to decide whether it is a high score or not, because we are only able to compare algorithms between the others. To say anything more meaningful about our methods we shall look at the distribution of the scores to make a better analysis of performance. It is also worth noting that not all algorithms managed to perfomrm imputations on all datasets, but differences in that issue were so little, that tey will not affect our scores.\
 
 \newpage
 ##### Distributions of scores
@@ -128,7 +128,7 @@ So to begin with we decided to treat the median/mode as the basic form of imputa
 |missmda    | -0.11|
 |VIM        | -0.11|
 
-Results achieved here are quite surprising. First of all the maximum gain in F1 score is only 0.02 and it is achieved by softImpute. But what can bewilder the most is the fact that only 2 out of 5 algorithms managed to perform better than the median/mode. These scores can raise questions about the whole purpose of using sophisticated algorithms, but of course, we are unable to say anything harsh about them yet. We can definitely note that we need to be we careful while using these algorithms, because they may lead to huge loss in scores, even up to -0.11, as here it is shown with missMDA. It is worth noting the order of the algorithms here, as we will use another method to compare the scores. 
+Results achieved here are quite surprising. First of all the maximum gain in F1 score is only 0.02 and it is achieved by softImpute. But what can bewilder the most is the fact that only 2 out of 5 algorithms managed to perform better than the median/mode. Score achieved by SoftImpute may be in some way caused by the fact, that it is using median imputation in some situations. These scores can raise questions about the whole purpose of using sophisticated algorithms, but of course, we are unable to say anything harsh about them yet. We can definitely note that we need to be we careful while using these algorithms, because they may lead to huge loss in scores, even up to -0.11, as here it is shown with missMDA. It is worth noting the order of the algorithms here, as we will use another method to compare the scores. 
 
 
 #### Second approach
