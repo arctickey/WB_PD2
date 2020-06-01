@@ -1,3 +1,9 @@
+---
+output:
+  pdf_document: default
+bibliography: ["cytowania.bib"]
+---
+
 ## Various data imputation techniques in R
 
 *Authors: Jan Borowski, Filip Chrzuszcz, Piotr Fic  (Warsaw University of Technology)*
@@ -92,23 +98,29 @@ After the long and tedious process of data imputation, it is finally time to eva
 - Accuracy
 
 These two measures complement each other well because they allow us to measure well the effectiveness of our imputations and algorithms on both balanced and unbalanced sets.
-
-|Method     | Accuracy|   F1|
-|:----------|--------:|----:|
-|median     |     0.83| 0.75|
-|mice       |     0.85| 0.75|
-|missForest |     0.85| 0.74|
-|missmda    |     0.82| 0.80|
-|softimpute |     0.86| 0.75|
-|VIM        |     0.85| 0.76|
+```{r echo=FALSE, message=FALSE, warning=FALSE , results='asis'}
+library(knitr)
+library(tidyverse)
+scores <- readr::read_csv('./final_score/ostatecznev2.csv')
+ramka <- scores %>% group_by(Method) %>% summarise(Accuracy = round(mean(Acc),2),F1 = round(mean(F1),2))
+knitr::kable(ramka,caption='Average scores of model on imputation methods')
+```
 
 Our experiment did not find out the best imputation algorithm, but we can derive some interesting conclusions from it.
 First of all, we can think about the median/mode imputation as kind of our baseline because it will be useful later. Surprisingly it seems to perform quite well, among the others, often quite sophisticated methods. It achieved over 80% of accuracy on average. However, it is hard to decide whether it is a high score or not, because we are only able to compare algorithms between the others. To say anything more meaningful about our methods we shall look at the distribution of the scores to make a better analysis of performance.\
 
-\newpage
+
 ##### Distributions of scores
 
-![](./images/2-4-0.png)![](./images/2-4-1.png)
+```{r echo=FALSE, message=FALSE, warning=FALSE,fig.width=3, fig.height=3.5,fig.show='hold',fig.align='center'}
+p1<-ggplot(scores, aes(x=Method, y=Acc, color=Method)) +
+  geom_boxplot()+theme_minimal()+labs(x="",y="")+theme( axis.text.x=element_blank())+ggtitle('Accuracy')
+p2<-ggplot(scores, aes(x=Method, y=F1, color=Method)) + 
+  geom_boxplot()+theme_minimal()+labs(x="",y="")+theme(axis.text.x=element_blank())+ggtitle('F1')
+p1
+p2
+
+```
 
 Taking a brief look at the distributions of accuracy score it seems quite unclear which algorithm performs the best. All medians seem to be approximately on the same level and also the first and third quartile of almost all of the plots have the same value. Only missMDA is a bit lower than the others, but this is too early to derive any conclusions.\
 
@@ -120,13 +132,56 @@ F1 scores give us much more information. The first thing that becomes apparent a
 
 So to begin with we decided to treat the median/mode as the basic form of imputation and we will compare it to all other methods. We want to check how much the average prediction measured made by other algorithms differed from the median/mode. As one prediction, we understand the average F1 score made by of all imputation methods on one data set. 
 
-|Method     | score|
-|:----------|-----:|
-|softimpute |  0.02|
-|missForest |  0.01|
-|mice       | -0.02|
-|missmda    | -0.11|
-|VIM        | -0.11|
+
+```{r echo=FALSE, message=FALSE,warning=FALSE}
+library(R.utils)
+library(prob)
+dane_o_imputacij <- scores
+ids <- dane_o_imputacij$Dataset
+x <- c(1,2,3)
+algosy <- c('log_reg','xgb','rf','svm')
+
+for (i in ids) {
+  
+  indeksy <- ifelse(dane_o_imputacij$Dataset==i,TRUE,FALSE)
+  dane_id <-  dane_o_imputacij[indeksy,]
+  expectet <- c('median','softimpute','missmda','mice','VIM','missForest')
+  founded <- dane_id$Method
+  insert_<- setdiff(expectet,founded)
+  
+  for (j in insert_){
+    for(a in algosy){
+  dane_o_imputacij <- rbind(dane_o_imputacij,c(1,i,j,a,0,0))
+  
+  }
+  dane_wynik <- dane_o_imputacij
+  }
+}
+data<- dane_wynik
+data$F1 <- as.double(data$F1)
+data$acc <- as.double(data$Acc)
+
+data[is.na(data)] <- 0
+data3 <- data %>% group_by(Dataset,Method) %>% summarise(mean=mean(acc,na.rm=TRUE))
+order_scores <- data3 %>% group_by(Dataset) %>% mutate(good_ranks = rank(-mean, ties.method = "max"))
+order_scores1 <- order_scores %>% group_by(Method) %>% summarise(wynik = sum(good_ranks))
+order_scores1 <- order_scores1[order(order_scores1$wynik),]
+colnames(order_scores1) <- c('Method','Score')
+
+
+data5 <- data %>% group_by(Dataset,Method) %>% summarise(mean=mean(F1,na.rm=TRUE))
+un <- length(unique(data5$Dataset))
+data5[data5$Method=='median','method'] = 'aaamedian'
+order_scores2 <- data5 %>% group_by(Dataset) %>% mutate(diff = max(mean) - mean)
+order_scores2 <- data5 %>% group_by(Dataset) %>% mutate(diff = mean - dplyr::lag(mean, default = mean[1]))
+scores1 <- order_scores2 %>% group_by(Method) %>% summarise(score = sum(diff)/un)
+x <- scores1[scores1$Method!='aaamedian',]
+x <- scores1[x$Method!='median',]
+x$score <- round(x$score,2)
+
+knitr::kable(x[order(x$score,decreasing = TRUE),])
+```
+
 
 Results achieved here are quite surprising. First of all the maximum gain in F1 score is only 0.02 and it is achieved by softImpute. But what can bewilder the most is the fact that only 2 out of 5 algorithms managed to perform better than the median/mode. These scores can raise questions about the whole purpose of using sophisticated algorithms, but of course, we are unable to say anything harsh about them yet. We can definitely note that we need to be we careful while using these algorithms, because they may lead to huge loss in scores, even up to -0.11, as here it is shown with missMDA. It is worth noting the order of the algorithms here, as we will use another method to compare the scores. 
 
@@ -135,14 +190,9 @@ Results achieved here are quite surprising. First of all the maximum gain in F1 
 
 As a second approach, we decide to simply rank each algorithm score on each data set, and then award points for each place. As a result, we sum up all of the points and the final score is the sum of the points across all data sets. Of course, the algorithm with the lowest amount of points wins.
 
-|Method     | Score|
-|:----------|-----:|
-|softimpute |    38|
-|median     |    39|
-|missForest |    48|
-|mice       |    49|
-|VIM        |    58|
-|missmda    |    69|
+```{r echo=FALSE, message=FALSE,warning=FALSE}
+knitr::kable(order_scores1)
+```
 
 Scores achieved here resemble these achieved here. The order is not the same, but the winner remains the same. Once again median/mode imputation managed to perform very well, outperforming many complicated algorithms. We can say that our scores are stable, so conclusions taken from these scores can be taken seriously.
 
@@ -150,7 +200,14 @@ Scores achieved here resemble these achieved here. The order is not the same, bu
 #### Times
 As a final tool of comparing algorithms, we decided to compare times of imputation. Obviously, even the algorithm with the best score, but with awful imputation time is considered useless, so this is important to take that factor to final evaluation.
 
-![](./images/2-4-2.png)
+
+
+```{r echo=FALSE, message=FALSE,warning=FALSE,warning=FALSE,fig.width=4,fig.height=3,fig.show='hold',fig.align='center'}
+times <- read.csv('./final_score/final.csv')
+p3<-ggplot(times, aes(x=X, y=V2, color=X)) +
+  geom_boxplot()+theme_minimal()+labs(x="",y="Seconds")+ggtitle('Times')+theme(legend.title=element_blank())+theme(axis.text.x=element_blank())
+p3
+```
 
 As we can see times of imputations made by each algorithm can vary heavily. There is no point in creating rankings like we did to analyze scores achieved by algorithms, but it is simply worth noting that our previous winner - softImpute is very quick, its plot looks the same as the median/mode plot, which is quite an achievement.
 On the other side, there is Mice, which times can reach very high values.
