@@ -180,7 +180,7 @@ x <- scores1[x$Method!='median',]
 x$score <- round(x$score,2)
 
 knitr::kable(x[order(x$score,decreasing = TRUE),])
-
+#write.csv(x[order(x$score,decreasing = TRUE),], "~/Pulpit/2-4-2.csv")
 ```
 
 
@@ -194,6 +194,7 @@ As a second approach, we decide to simply rank each algorithm score on each data
 
 ```{r echo=FALSE, message=FALSE,warning=FALSE}
 knitr::kable(order_scores1)
+#write.csv(order_scores1, "~/Pulpit/2-4-3.csv")
 ```
 
 Scores achieved here resemble these achieved here. The order is not the same, but the winner remains the same. Once again median/mode imputation managed to perform very well, outperforming many complicated algorithms. We can say that our scores are stable, so conclusions taken from these scores can be taken seriously.
