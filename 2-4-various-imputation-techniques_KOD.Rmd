@@ -103,6 +103,7 @@ library(knitr)
 library(tidyverse)
 scores <- readr::read_csv('./final_score/ostatecznev2.csv')
 ramka <- scores %>% group_by(Method) %>% summarise(Accuracy = round(mean(Acc),2),F1 = round(mean(F1),2))
+ramka <- ramka[order(ramka$Accuracy, decreasing = T),]
 knitr::kable(ramka,caption='Average scores of model on imputation methods')
 ```
 
