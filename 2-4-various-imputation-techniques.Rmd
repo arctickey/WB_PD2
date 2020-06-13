@@ -54,21 +54,15 @@ After cleaning data sets were transferred to the next step.
 #### Data Imputation
 Clean data sets were split into two data sets, training and testing, in proportion $1/4$ respectively. This split was performed randomly and only once for every data set. It means, every imputation technique used the same split. Imputation was performed separately for train and test sets. Before split, we also removed the target column to avoid using it in imputation. For our study, we decided to choose five packages designed for missing data imputation in the R language and one self-implemented basic technique:
 
-- **Mode and median**: Simple technique of filling missing values with mode (for categorical variables) and median (for continuous variables) of complete values in a variable. Implemented with basic R language functions.
-- **mice**[@2_4_mice2011]: Package allows to perform multivariate imputation by chained equations (MICE), which is a type of multiple imputation. The method is based on Fully Conditional Specification, where each incomplete variable is imputed by a separate model.
+- **Mode and median**: Simple technique of filling missing values with mode (for categorical variables) and median (for continuous variables) of complete values in a variable. Implemented with basic R language functions. Is a very simple method and it is used as a base result for more complex algorithms to compare.
+- **mice**[@2_4_mice2011]: Package allows to perform multivariate imputation by chained equations (MICE), which is a type of multiple imputation. The method is based on Fully Conditional Specification, where each incomplete variable is imputed by a separate model. Imputation method from mice package don't require any form of help, because they can impute numeric and categorical features.
 - **missMDA**[@2_4_missMDA2016]: Package for multiple missing values imputation. Data sets are imputed with the principal component method, regularized iterative FAMD algorithm (factorial analysis for mixed data). Firstly estimation of the number of dimensions for factorial analysis is essential.
-- **missFOREST**[@2_4_missForest2012]: Package can be used for imputation with predictions of the random forest model, trained on complete observations. The package works on data with complex interactions and non-linear relations. Enables parallel calculations.
-- **softImpute**[@2_4_R-softImpute]: Package for matrix imputation with nuclear-norm regularization. The algorithm works like EM, solving an optimization problem using a soft-thresholded SVD algorithm.  Works only with continuous variables.
-- **VIM**[@2_4_VIM2016]: Package for visualization and imputation of missing values. It offers iterative robust model-based imputation (IRMI). In each iteration, one variable is used as a response variable and the remaining variables as the regressors.
+- **missFOREST**[@2_4_missForest2012]: Package can be used for imputation with predictions of the random forest model, trained on complete observations. The package works on data with complex interactions and non-linear relations. Enables parallel calculations. Algorithm can be used on both numeric and categorical features and is capable of performing imputation without any help of other methods.
+- **softImpute**[@2_4_R-softImpute]: Package for matrix imputation with nuclear-norm regularization. The algorithm works like EM, solving an optimization problem using a soft-thresholded SVD algorithm.  Works only with continuous variables. SoftImpute package works only with numeric features. To compare it with other algorithms on the same data, we use softImpute for numeric variables and mode for categorical variables. Alternatively, it is possible to use softImpute for numeric features and different algorithms for categorical variables, but we decided that this approach may lead to unreliable results.
+- **VIM**[@2_4_VIM2016]: Package for visualization and imputation of missing values. It offers iterative robust model-based imputation (IRMI). In each iteration, one variable is used as a response variable and the remaining variables as the regressors. This method additionally creates new columns with information whether the observation was imputed or not. We decided to do not use these columns, because other methods do not create them.
 
 
-First, we use median/mode imputation, which is a very simple method and it is used as a base result for more complex algorithms to compare.
-Imputation method from mice package don't require any form of help, because they can impute numeric and categorical features.
-SoftImpute package works only with numeric features. To compare it with other algorithms on the same data, we use softImpute for numeric variables and mode for categorical variables. Alternatively, it is possible to use softImpute for numeric features and different algorithms for categorical variables, but we decided that this approach may lead to unreliable results.
-MissForest algorithm can be used on both numeric and categorical features and is capable of performing imputation without any help of other methods.
-Imputation method from Mice package also can be run on all types of data.
-Iterative Robust Model-Based Imputation method from VIM package can impute all types of data. This method additionally creates new columns with information whether the observation was imputed or not. We decided to do not use these columns, because other methods do not create them.
-The last method which we covered is missMDA which also can be used to impute numeric and categorical features.
+
 After imputation, we add back target variable to both sets. All methods work on the same parameters for all data sets. Not all methods were able to impute all 14 data sets. This fact will be taken into account in the subsequent analysis of the results.
 
 #### Model traing 
@@ -77,9 +71,16 @@ For classification task we use four classification algorithms:
 - Extreme Gradient Boosting, 
 - Random Forest, 
 - Support Vector Machines,
-- Linear Regression 
+- Logistic Regression 
 
-All methods were implemented in **mlr** package [@2_4_mlr]. For hyperparameters tuning, we also used methods from the same package. For all data sets, four classifiers were trained and tuned on the same train sets. To select parameters we used Grid Search. We will not focus on this part of the experiment. The most important part of this step is that every model training was carried out the same way. This means that differences in results can be caused only by the influence of previously used imputation technique. 
+All methods were implemented in **mlr** package [@2_4_mlr]. For hyperparameters tuning, we also used methods from the same package. For all data sets, four classifiers were trained and tuned on the same train sets. To select parameters we used Grid Search. For all algoritm selected parametrs was tuned (more information about params in package description): 
+
+- XGB (etc, gamma, max_depth, subsample)   
+- Random Forest (num.trees, min.node.size)
+- SVM (gamma)
+- Logistic Regression (alpha, nlambda)
+
+We will not focus on this part of the experiment. The most important part of this step is that every model training was carried out the same way. This means that differences in results can be caused only by the influence of previously used imputation technique. 
 
 #### Model evaluation 
 After previous steps, we have got trained models and test sets. In the final step we evaluate models and imputations methods. For every imputation and algorithm we calculate F1 score expressed by formula $2\frac{(precision)\cdot(recall)}{precision + recall}$ and accuracy. We chose accuracy as the basic and most popular metric, and F1 which is a better metric for unbalanced sets. A detailed discussion about results in the next section.
