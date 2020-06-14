@@ -73,7 +73,7 @@ For classification task we use four classification algorithms:
 - Support Vector Machines,
 - Logistic Regression 
 
-All methods were implemented in **mlr** package [@2_4_mlr]. For hyperparameters tuning, we also used methods from the same package. For all data sets, four classifiers were trained and tuned on the same train sets. To select parameters we used Grid Search. For all algoritm selected parametrs was tuned (more information about params in package description): 
+All methods were implemented in **mlr** package [@2_4_mlr]. For hyperparameters tuning, we also used methods from the same package. For all data sets, four classifiers were trained and tuned on the same train sets. To select parameters we used Grid Search. For all algorithms selected parameters were tuned (more information about parameters in package description): 
 
 - XGB (etc, gamma, max_depth, subsample)   
 - Random Forest (num.trees, min.node.size)
@@ -96,7 +96,7 @@ These two measures complement each other well because they allow us to measure w
 
 |Method     | Accuracy|   F1|
 |:----------|--------:|----:|
-|softimpute |     0.86| 0.75|
+|softImpute |     0.86| 0.75|
 |mice       |     0.85| 0.75|
 |missForest |     0.85| 0.74|
 |VIM        |     0.85| 0.76|
@@ -121,7 +121,7 @@ To begin with, we decided to treat the median/mode as the basic form of imputati
 
 |Method     | score|
 |:----------|-----:|
-|softimpute |  0.02|
+|softImpute |  0.02|
 |missForest |  0.01|
 |mice       | -0.02|
 |missmda    | -0.11|
@@ -137,7 +137,7 @@ As a second approach, for each data set we decided to rank imputation methods ac
 
 |Method     | Score|
 |:----------|-----:|
-|softimpute |    38|
+|softImpute |    38|
 |median     |    39|
 |missForest |    48|
 |mice       |    49|
