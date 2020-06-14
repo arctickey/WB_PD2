@@ -87,7 +87,7 @@ After previous steps, we have got trained models and test sets. In the final ste
 
 ### Results
 
-After the long and tedious process of data imputation, it is finally time to evaluate our methods of imputation. Methods were trained and tested on 14 data sets and evaluated strictly using 2 methods mentioned earlier. Before score analysis, it is worth mentioning that all algorithms were tested with optimal parameters, so the score should be quite meaningful. The table below presents average metrics achieved by models, depending on the imputation method. As described earlier, we decided to use two measures of algorithm effectiveness:
+After the long and tedious process of data imputation, it is finally time to evaluate our methods of imputation. Methods were trained and tested on 14 data sets and evaluated strictly using 2 methods mentioned earlier. Before score analysis, it is worth mentioning that all algorithms were tested with optimal parameters, so the score should be quite meaningful. The *Table 1* below presents average metrics achieved by models, depending on the imputation method. As described earlier, we decided to use two measures of algorithm effectiveness:
 
 - F1 score
 - Accuracy
@@ -111,9 +111,9 @@ First of all, we can think about the median/mode imputation as kind of baseline 
 
 ![](./images/2-4-0.png){width=50%}![](./images/2-4-1.png){width=50%}
 
-Taking a brief look at the distributions of accuracy score, it seems quite unclear which algorithm performs the best. All medians seem to be approximately on the same level and also the first and third quartile, of almost all scores distributions, have the same value. Only missMDA is a bit lower than the others, but this is too early to derive any conclusions.\
+Taking a brief look at the distributions of accuracy score (*Figure 1*), it seems quite unclear which algorithm performs the best. All medians seem to be approximately on the same level and also the first and third quartile, of almost all scores distributions, have the same value. Only missMDA is a bit lower than the others, but this is too early to derive any conclusions.\
 
-F1 scores give us much more information. The first thing that becomes apparent after looking at that plot is the fact that we do have some very low values for every type of imputation. However, this is simply because some of our data sets were very small, saw neither of our algorithms was able to achieve recall above 0. Besides from that, once again scores of all algorithms were quite close to each other. It is also worth noting that not all algorithms managed to perform imputations on all data sets. For this reason, the analysis of only the means and distributions alone may not be fully objective. To create a fair comparison, we decided to use two different methods of comparing and classifying these algorithms, so that we will be able to choose our winner.
+F1 scores (*Figure 2*) give us much more information. The first thing that becomes apparent after looking at that plot is the fact that we do have some very low values for every type of imputation. However, this is simply because some of our data sets were very small, saw neither of our algorithms was able to achieve recall above 0. Besides from that, once again scores of all algorithms were quite close to each other. It is also worth noting that not all algorithms managed to perform imputations on all data sets. For this reason, the analysis of only the means and distributions alone may not be fully objective. To create a fair comparison, we decided to use two different methods of comparing and classifying these algorithms, so that we will be able to choose our winner.
 
 #### Median/mode baseline score
 
@@ -128,7 +128,7 @@ To begin with, we decided to treat the median/mode as the basic form of imputati
 |VIM        | -0.11|
 Table: Table 2
 
-Results achieved here are quite surprising. First of all the maximum gain in F1 score is only 0.02 and it is achieved by softImpute. But what can bewilder the most is the fact that only 2 out of 5 algorithms managed to perform better than the median/mode. Score achieved by SoftImpute may be in some way caused by the fact, that it is using mode imputation for categorical variables. For some data sets its imputation becomes very similar to mode/median, if there are many more categorical variables than numeric ones. These scores can raise questions about the whole purpose of using sophisticated algorithms, but of course, we are unable to say anything harsh about them yet. We can definitely note that we need to be we careful while using these algorithms, because they may lead to huge loss in scores, even up to -0.11, as here it is shown with missMDA. It is worth noting the order of the algorithms here, as we will use another method to compare the scores. 
+Results achieved here (*Table 2*) are quite surprising. First of all the maximum gain in F1 score is only 0.02 and it is achieved by softImpute. But what can bewilder the most is the fact that only 2 out of 5 algorithms managed to perform better than the median/mode. Score achieved by SoftImpute may be in some way caused by the fact, that it is using mode imputation for categorical variables. For some data sets its imputation becomes very similar to mode/median, if there are many more categorical variables than numeric ones. These scores can raise questions about the whole purpose of using sophisticated algorithms, but of course, we are unable to say anything harsh about them yet. We can definitely note that we need to be we careful while using these algorithms, because they may lead to huge loss in scores, even up to -0.11, as here it is shown with missMDA. It is worth noting the order of the algorithms here, as we will use another method to compare the scores. 
 
 
 #### Second approach
@@ -145,7 +145,7 @@ As a second approach, for each data set we decided to rank imputation methods ac
 |missmda    |    69|
 Table: Table 3
 
-Scores achieved here resemble these achieved before. The order is not the same, but the winner remains the same. Once again median/mode imputation managed to perform very well, outperforming many complicated algorithms. We can say that our scores are stable, so conclusions taken from these scores can be taken seriously.
+Scores achieved here (*Table 3*) resemble these achieved before. The order is not the same, but the winner remains the same. Once again median/mode imputation managed to perform very well, outperforming many complicated algorithms. We can say that our scores are stable, so conclusions taken from these scores can be taken seriously.
 
 
 #### Times
@@ -155,7 +155,7 @@ As a final tool of comparing algorithms, we decided to compare times of imputati
 ![](./images/2-4-2.png){width=50%}
 </center>
 
-As we can see times of imputations made by each algorithm can vary heavily. There is no point in creating rankings like we did to analyze scores achieved by algorithms, but it is simply worth noting that our previous winner - softImpute is very quick, its plot looks the same as the median/mode plot, which is quite an achievement.
+As we can see (*Figure 3*) times of imputations made by each algorithm can vary heavily. There is no point in creating rankings like we did to analyze scores achieved by algorithms, but it is simply worth noting that our previous winner - softImpute is very quick, its plot looks the same as the median/mode plot, which is quite an achievement.
 On the other side, there is Mice, which times can reach very high values.
 
 
