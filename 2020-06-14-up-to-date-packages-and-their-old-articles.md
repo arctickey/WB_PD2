@@ -10,10 +10,7 @@ tags:
 
 ### Wstęp
 
-x  
-x  
-x  
-
+The reproducibility of science paper is a huge and important problem. Today we wont to talk about one part of that problem. What If? after publishing article researchers still develop their packages changing function, optimize, etc. In the discussed article researcher focused on this particular situation. They selected articles where used package was still developed until today and check reproducibility. Thay use code in the selected article and check if it is possible to run it today. You will be surprised how many levels of reproducibility can be distinct.t
 ### Metodologia
 
 x  
