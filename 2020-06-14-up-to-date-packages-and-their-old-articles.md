@@ -8,10 +8,11 @@ tags:
 - scientific papers
 ---
 
-### Wstęp
+### Intro
 
 The reproducibility of science paper is a huge and important problem. Today we will not talk about one part of that problem. What if after publishing article researchers still develop their packages changing function, optimize, etc. In the discussed article researcher focused on this particular situation. They selected articles where used package was still developed until today and check reproducibility. Thay use code in the selected article and check if it is possible to run it today. You will be surprised how many levels of reproducibility can be distinct.
-### Metodologia
+### Methodology
+
 In order to fully understand the topic authors decided to analyze 13 articles which use 16 different R packages.
 The aim is to check wheter code used in these articles still can be used and does it give good results. In order to categorize efforts authors proposed 5 categories ranging from 'FULLY REP', which means that this chunk can be used without any troubles and give expected result, up to 'NO REP', what obviusly means that code is not working.
 During practical work with the data authors has stumbled upon a few problems, because not all cases could have fit into their categories. For example if some chunks were dependant on other parts of code, which was already deprecated or unable to reach, they decided to mark this as 'NO REP'. If needed changes were not significant, ex. changing names of columns or replacing a few rows, then that article was marked as 'HAD TO CHANGE STH', or even 'FULLY REP', which meant that it can be easily used.
